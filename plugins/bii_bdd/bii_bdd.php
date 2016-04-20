@@ -2,12 +2,12 @@
 /*
   Plugin Name: BiiBDD
   Description: Ajoute des classes de base de données
-  Version: 0.1
+  Version: 1.0
   Author: Biilink Agency
   Author URI: http://biilink.com/
   License: GPL2
  */
-define('bii_bdd_version', '0.1');
+define('bii_bdd_version', '1.0');
 
 
 add_action("bii_informations", function() {

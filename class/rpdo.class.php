@@ -87,7 +87,6 @@ class rpdo {
 	public static function getInstance() {
 		//singleton
 		if (!self::$instance) {
-
 			global $wpdb;
 			$wpextended = new wpdbExtended($wpdb);
 			$connexionArray = $wpextended->connexionArray();
