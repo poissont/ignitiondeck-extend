@@ -1015,7 +1015,7 @@ function bii_SC_projet_mini($attrs) {
 			$actions = "<a title='Edit Project' href='$urlmodif'>Modifier ce projet <i class='fa fa-edit'></i></a>";
 			$project = bii_project::fromIdPost($post_id);
 			$project_cat = utf8_encode($project->getCategorieName());
-			$project_nb_contributeurs = (int) bii_SC_Project_Supporters(["post_id" => $post_id]);
+			$project_nb_contributeurs = (int) bii_SC_Project_Supporters(["product" => $project_id]);
 
 			ob_start();
 			?>
@@ -1128,8 +1128,7 @@ function bii_SC_Project_Supporters($args) {
 	}
 
 	if ($project_id) {
-		$project = new ID_Project($project_id);
-		$nb = $project->get_project_orders();
+		$nb = ign_pay_info::nb("product_id = $project_id");
 	}
 	return $nb;
 }
