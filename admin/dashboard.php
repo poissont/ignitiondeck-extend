@@ -9,7 +9,7 @@
 		<h1 class="faa-parent animated-hover"><span class="fa fa-rocket faa-passing"></span> Plugin Initiondeskextend version <?= IDCExtend_version; ?></h1>
 
 	</div>
-	<div class="col-xxs-12 col-md-8">
+	<div class="col-xxs-12 col-md-10">
 		<div class="col-xxs-12">
 			<div class="meta-box-holder">
 				<ul class="nav nav-tabs bii-option-title">

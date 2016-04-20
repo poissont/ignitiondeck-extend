@@ -345,6 +345,9 @@ if (!function_exists("debugEcho")) {
 	}
 
 	function bii_makeinput($option, $type = "text", $class = "", $options = [], $echo = true) {
+		if(!get_option($option)){
+			update_option($option,0);
+		}
 		$value = stripcslashes(get_option($option));
 		$class .= " form-control";
 		if ($type == "textarea") {

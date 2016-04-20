@@ -3,11 +3,11 @@
 /*
   Plugin Name: Ignitiondeck-extend
   Description: Ignitiondeck-extend - Initiondesk Extension for better languages and shortcodes
-  Version: 0.7.9
+  Version: 0.8.0
   Author: BiilinkAgency
  */
 
-define('IDCExtend_version', '0.7.9');
+define('IDCExtend_version', '0.8.0');
 define('IDCE_PATH', plugin_dir_path(__FILE__));
 
 define('Bii_plugin_slug',"Biilinkplugin");
@@ -27,6 +27,8 @@ if (!get_option("bii_IDCE_installed")) {
 
 //Plugin biidebug, ajout de fonctions
 require_once(plugin_dir_path(__FILE__) . "/plugins/biidebug/biidebug.php");
+//Plugin biibdd, ajout de fonctions bases de données
+require_once(plugin_dir_path(__FILE__) . "/plugins/bii_bdd/bii_bdd.php");
 
 //Plugin biiadvanced admin, ajout de fonctionnalités ajax sur l'interface d'admin
 require_once(plugin_dir_path(__FILE__) . "/plugins/biiadvanced-admin/biiadvanced-admin.php");

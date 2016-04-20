@@ -23,16 +23,23 @@ class wpdbExtended extends wpdb {
 }
 
 class cpdo {
-//Base de données des communes
+
 	private static $instance = null;
 
 	public static function getInstance() {
 		//singleton
+		if (!get_option("bii_use_bddcommunes")) {
+			throw new Exception("Vous essayez d'utiliser la base de données des communes alors qu'elle n'est pas initialisée", "1719");
+		}
+		if (!get_option("bii_host_plugin")||!get_option("bii_name_plugin")||!get_option("bii_user_plugin")||!get_option("bii_pwd_plugin")) {
+			throw new Exception("Vous essayez d'utiliser la base de données des communes alors qu'elle n'est pas configurée", "1720");
+		}
 		if (!self::$instance) {
-			$rpdo_host = "localhost";
-			$rpdo_name = "jador2";
-			$rpdo_user = "jador";
-			$rpdo_pwd = "GJqcTCp4";
+
+			$rpdo_host = get_option("bii_host_communes");
+			$rpdo_name = get_option("bii_name_communes");
+			$rpdo_user = get_option("bii_user_communes");
+			$rpdo_pwd = get_option("bii_pwd_communes");
 
 			$db = new PDO('mysql:host=' . $rpdo_host . ';dbname=' . $rpdo_name, $rpdo_user, $rpdo_pwd);
 			$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
@@ -44,17 +51,23 @@ class cpdo {
 }
 
 class ppdo {
-//Base de données du plugin biiproducts
+
 	private static $instance = null;
 
 	public static function getInstance() {
 		//singleton
+		if (!get_option("bii_use_bddplugin")) {
+			throw new Exception("Vous essayez d'utiliser la base de données du plugin alors qu'elle n'est pas initialisée", "1721");
+		}
+		if (!get_option("bii_host_plugin")||!get_option("bii_name_plugin")||!get_option("bii_user_plugin")||!get_option("bii_pwd_plugin")) {
+			throw new Exception("Vous essayez d'utiliser la base de données du plugin alors qu'elle n'est pas configurée", "1722");
+		}
 		if (!self::$instance) {
 
-			$rpdo_host = "localhost";
-			$rpdo_name = "lhavrais2";
-			$rpdo_user = "lhavrais";
-			$rpdo_pwd = "R6cyMLv9";
+			$rpdo_host = get_option("bii_host_plugin");
+			$rpdo_name = get_option("bii_name_plugin");
+			$rpdo_user = get_option("bii_user_plugin");
+			$rpdo_pwd = get_option("bii_pwd_plugin");
 
 
 			$db = new PDO('mysql:host=' . $rpdo_host . ';dbname=' . $rpdo_name, $rpdo_user, $rpdo_pwd);
@@ -67,6 +80,7 @@ class ppdo {
 }
 
 class rpdo {
+
 //Base de connées du site
 	private static $instance = null;
 
