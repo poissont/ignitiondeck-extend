@@ -1150,8 +1150,9 @@ add_shortcode('prequel_supporters', function($args) {
 		if ($nb < 2 && $args["text-singulier"]) {
 			$text = $args["text-singulier"];
 		}
-		return "$nb $text";
+		return str_replace("%nombre%", $nb, $text);
 	}
+	return $nb;
 });
 
 
@@ -1232,11 +1233,27 @@ add_action("bii_specific_shortcodes", function() {
 	</tr>
 	<tr>
 		<td><strong>[prequel_projets]</strong></td>
-		<td>affiche les projets de l'utilisateur actif, il est possible d'inqiquer le nombre de colonnes responsive avec les paramètres columns columns-large columns-tablet et columns-phone</td>
+		<td>affiche les projets de l'utilisateur actif<!--, il est possible d'inqiquer le nombre de colonnes responsive avec les paramètres columns columns-large columns-tablet et columns-phone--></td>
 	</tr>
 	<tr>
 		<td><strong>[prequel_projet id='X']</strong></td>
-		<td>affiche le projet d'identifiant = X, les mêmes options que [prequel_projets] pour les colonnes sont disponibles</td>
+		<td>affiche le projet d'id post = X<!--, les mêmes options que [prequel_projets] pour les colonnes sont disponibles --></td>
+	</tr>
+	<tr>
+		<td><strong>[projet_propose_par project='X']</strong></td>
+		<td>affiche le nom de l'entreprise qui a proposé le projet d'identifiant = X</td>
+	</tr>
+	<tr>
+		<td><strong>[projet_fonds_sur_but project='X']</strong></td>
+		<td>affiche {somme_recoltée} collectés sur {somme_demandée} pour le projet d'identifiant = X</td>
+	</tr>
+	<tr>
+		<td><strong>[projet_jours_restants project='X']</strong></td>
+		<td>affiche le nombre de jours restants pour le projet d'identifiant = X</td>
+	</tr>
+	<tr>
+		<td><strong>[prequel_supporters project='X' &lt; text="texte" text-singulier="texte" &gt;]</strong></td>
+		<td>affiche le nombre de contributeurs pour le projet d'identifiant = X, text-singulier s'il existe s'affichera si le nombre de contributeurs est inférieur à 2, sinon text est affiché. Si text n'existe pas seul le nombre d'affiche. Entrez %nombre% pour afficher le nombre</td>
 	</tr>
 
 	<?php
