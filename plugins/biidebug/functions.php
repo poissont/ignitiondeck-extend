@@ -19,16 +19,12 @@ if (!function_exists("debugEcho")) {
 		if (bii_canshow_debug()) {
 			$string = addslashes($string);
 			?><script>console.log('<?php echo $string; ?>');</script><?php
-			}
 		}
+	}
 
-		function consoleDump($var) {
-			if (bii_canshow_debug()) {
-//	ob_start();
-//	var_dump($var);
-//	$string = ob_get_contents();
-//	ob_end_clean();
-				?><script>console.log('<?php serialize($var); ?>');</script><?php
+	function consoleDump($var) {
+		if (bii_canshow_debug()) {
+			?><script>console.log('<?php serialize($var); ?>');</script><?php
 		}
 	}
 
@@ -53,7 +49,7 @@ if (!function_exists("debugEcho")) {
 			if (!is_array($item)) {
 				$$key = urldecode($item);
 				consoleLog("$key => $item");
-			}else {
+			} else {
 				$log = "$key => {";
 				foreach ($item as $key2 => $val) {
 					$log .= " $key2=>$val";
@@ -69,7 +65,7 @@ if (!function_exists("debugEcho")) {
 			if (!is_array($item)) {
 				$$key = urldecode($item);
 				pre("$key => $item");
-			}else {
+			} else {
 				$log = "$key => {";
 				foreach ($item as $key2 => $val) {
 					$log .= " $key2=>$val";
@@ -117,11 +113,11 @@ if (!function_exists("debugEcho")) {
 		return $return;
 	}
 
-	function startVoyelle($string,$y_is_a_voyelle = true) {
+	function startVoyelle($string, $y_is_a_voyelle = true) {
 		$voyelle = false;
 		$string = strtolower(remove_accents($string));
 		$array_voyelles = array("a", "e", "i", "o", "u");
-		if($y_is_a_voyelle){
+		if ($y_is_a_voyelle) {
 			$array_voyelles[] = "y";
 		}
 		if (in_array($string[0], $array_voyelles)) {
@@ -212,8 +208,8 @@ if (!function_exists("debugEcho")) {
 	}
 
 	function bii_makeinput($option, $type = "text", $class = "", $options = [], $echo = true) {
-		if(!get_option($option)){
-			update_option($option,0);
+		if (!get_option($option)) {
+			update_option($option, 0);
 		}
 		$value = stripcslashes(get_option($option));
 		$class .= " form-control";
@@ -316,7 +312,7 @@ if (!function_exists("debugEcho")) {
 		return $r;
 	}
 
-	function bootstrap_builder($nb_cols_md = 3, $nb_cols_sm = 2, $nb_cols_xs = 1, $nb_cols_xxs = 1, $nb_cols_lg = 4,$use_visual_composer = true) {
+	function bootstrap_builder($nb_cols_md = 3, $nb_cols_sm = 2, $nb_cols_xs = 1, $nb_cols_xxs = 1, $nb_cols_lg = 4, $use_visual_composer = true) {
 		$douziemes = [
 //			"xxs"=>divisionbootstrap($nb_cols_xxs),
 			"xs" => divisionbootstrap($nb_cols_xs),
@@ -327,7 +323,7 @@ if (!function_exists("debugEcho")) {
 		$class = "";
 		$nbprec = 0;
 		$prefix = "";
-		if($use_visual_composer){
+		if ($use_visual_composer) {
 			$prefix = "vc_";
 		}
 		foreach ($douziemes as $screen => $nb) {
@@ -340,6 +336,200 @@ if (!function_exists("debugEcho")) {
 		}
 		bii_write_log($class);
 		return $class;
+	}
+
+	function bii_cvnbst($nombre) {
+		$nb1 = Array('un', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit', 'neuf', 'dix', 'onze', 'douze', 'treize', 'quatorze', 'quinze', 'seize', 'dix-sept', 'dix-huit', 'dix-neuf');
+
+		$nb2 = Array('vingt', 'trente', 'quarante', 'cinquante', 'soixante', 'soixante', 'quatre-vingt', 'quatre-vingt');
+
+		# Décomposition du chiffre
+		# Séparation du nombre entier et des décimales
+		if (preg_match("/\b,\b/i", $nombre)) {
+			$nombre = explode(',', $nombre);
+		} else {
+			$nombre = explode('.', $nombre);
+		}
+		$nmb = $nombre[0];
+
+		# Décomposition du nombre entier par tranche de 3 nombre (centaine, dizaine, unitaire)
+		$i = 0;
+		while (strlen($nmb) > 0) {
+			$nbtmp[$i] = substr($nmb, -3);
+			if (strlen($nmb) > 3) {
+				$nmb = substr($nmb, 0, strlen($nmb) - 3);
+			} else {
+				$nmb = '';
+			}
+			$i++;
+		}
+		$nblet = '';
+		## Taitement du côté entier
+		for ($i = 1; $i >= 0; $i--) {
+			if (strlen(trim($nbtmp[$i])) == 3) {
+				$ntmp = substr($nbtmp[$i], 1);
+
+				if (substr($nbtmp[$i], 0, 1) <> 1 && substr($nbtmp[$i], 0, 1) <> 0) {
+					$nblet.=$nb1[substr($nbtmp[$i], 0, 1) - 1];
+					if ($ntmp <> 0) {
+						$nblet.=' cent ';
+					} else {
+						$nblet.=' cents ';
+					}
+				} elseif (substr($nbtmp[$i], 0, 1) <> 0) {
+					$nblet.='cent ';
+				}
+			} else {
+				$ntmp = $nbtmp[$i];
+			}
+
+			if ($ntmp > 0 && $ntmp < 20) {
+				if (!($i == 1 && $nbtmp[$i] == 1)) {
+					$nblet.=$nb1[$ntmp - 1] . ' ';
+				}
+			}
+
+			if ($ntmp >= 20 && $ntmp < 60) {
+				switch (substr($ntmp, 1, 1)) {
+					case 1 : $sep = ' et ';
+						break;
+					case 0 : $sep = '';
+						break;
+					default: $sep = '-';
+				}
+				$nblet.=$nb2[substr($ntmp, 0, 1) - 2] . $sep . $nb1[substr($ntmp, 1, 1) - 1] . ' ';
+			}
+
+			if ($ntmp >= 60 && $ntmp < 80) {
+				$nblet.=$nb2[4];
+				switch (substr($ntmp, 1, 1)) {
+					case 1 : $sep = ' et ';
+						break;
+					case 0 : $sep = '';
+						break;
+					default: $sep = '-';
+				}
+
+				if (substr($ntmp, 0, 1) <> 7) {
+					$nblet.=$sep . $nb1[substr($ntmp, 1, 1) - 1] . ' ';
+				} else {
+					if (substr($ntmp, 1, 1) + 9 == 9)
+						$sep = '-';
+					$nblet.=$sep . $nb1[substr($ntmp, 1, 1) + 9] . ' ';
+				}
+			}
+
+			if ($ntmp >= 80 && $ntmp < 100) {
+				$nblet.=$nb2[6];
+				switch (substr($ntmp, 1, 1)) {
+					case 1 : $sep = ' et ';
+						break;
+					case 0 : $sep = '';
+						break;
+					default: $sep = '-';
+				}
+
+				//if(substr($ntmp,1,1)<>0){
+				if (substr($ntmp, 0, 1) <> 9) {
+					$nblet.=$sep . $nb1[substr($ntmp, 1, 1) - 1];
+					if (substr($ntmp, 1, 1) == 0)
+						$nblet.='s';
+				}else {
+					if (substr($ntmp, 1, 1) == 0)
+						$sep = '-';
+					$nblet.=$sep . $nb1[substr($ntmp, 1, 1) + 9];
+				}
+				$nblet.=' ';
+				//}elseif(substr($ntmp,0,1)<>9){
+				//    $nblet.='s ';
+				//}else{
+				//    $nblet.=' ';
+				//}
+			}
+
+			if ($i == 1 && $nbtmp[$i] <> 0) {
+				if ($nbtmp[$i] > 1) {
+					$nblet.='milles ';
+				} else {
+					$nblet.='mille ';
+				}
+			}
+		}
+
+		if ($nombre[0] > 1)
+			$nblet.='euros ';
+		if ($nombre[0] == 1)
+			$nblet.='euro ';
+
+		## Traitement du côté décimale
+		if ($nombre[0] > 0 && $nombre[1] > 0)
+			$nblet.=' et ';
+		$ntmp = substr($nombre[1], 0, 2);
+		if (!empty($ntmp)) {
+			if ($ntmp > 0 && $ntmp < 20) {
+				$nblet.=$nb1[$ntmp - 1] . ' ';
+			}
+
+			if ($ntmp >= 20 && $ntmp < 60) {
+				switch (substr($ntmp, 1, 1)) {
+					case 1 : $sep = ' et ';
+						break;
+					case 0 : $sep = '';
+						break;
+					default: $sep = '-';
+				}
+				$nblet.=$nb2[substr($ntmp, 0, 1) - 2] . $sep . $nb1[substr($ntmp, 1, 1) - 1] . ' ';
+			}
+
+			if ($ntmp >= 60 && $ntmp < 80) {
+				$nblet.=$nb2[4];
+				switch (substr($ntmp, 1, 1)) {
+					case 1 : $sep = ' et ';
+						break;
+					case 0 : $sep = '';
+						break;
+					default: $sep = '-';
+				}
+
+				if (substr($ntmp, 0, 1) <> 7) {
+					$nblet.=$sep . $nb1[substr($ntmp, 1, 1) - 1] . ' ';
+				} else {
+					if (substr($ntmp, 1, 1) + 9 == 9)
+						$sep = '-';
+					$nblet.=$sep . $nb1[substr($ntmp, 1, 1) + 9] . ' ';
+				}
+			}
+
+			if ($ntmp >= 80 && $ntmp < 100) {
+				$nblet.=$nb2[6];
+				switch (substr($ntmp, 1, 1)) {
+					case 0 : $sep = '';
+						break;
+					default: $sep = '-';
+				}
+
+				if (substr($ntmp, 0, 1) <> 9) {
+					$nblet.=$sep . $nb1[substr($ntmp, 1, 1) - 1];
+					if (substr($ntmp, 1, 1) == 0)
+						$nblet.='s';
+				}else {
+					if (substr($ntmp, 1, 1) == 0)
+						$sep = '-';
+					$nblet.=$sep . $nb1[substr($ntmp, 1, 1) + 9];
+				}
+				$nblet.=' ';
+			}
+
+			if ($ntmp <> 0 && !empty($ntmp)) {
+				if ($ntmp > 1) {
+					$nblet.='cents ';
+				} else {
+					$nblet.='cent ';
+				}
+			}
+		}
+
+		return $nblet;
 	}
 
 }

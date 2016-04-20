@@ -101,5 +101,17 @@ class posts extends global_class {
 			return [];
 		}
 	}
+	
+	public function getCategories($where = ""){
+		$prefix = static::prefix_bdd();
+		$term_relationships = $prefix."term_relationships";
+		$wheredefault = "term_taxonomy_id in(select term_taxonomy_id from $term_relationships where object_id = ".$this->id().")";
+		$liste_ids = term_taxonomy::get_term_ids($wheredefault.$where);
+		$cats = [];
+		foreach($liste_ids as $id){
+			$cats[] = new terms($id);
+		}
+		return $cats;
+	}
 
 }

@@ -1,5 +1,7 @@
 <?php
+
 class ign_pay_info extends global_class {
+
 	protected $id;
 	protected $first_name;
 	protected $last_name;
@@ -16,12 +18,9 @@ class ign_pay_info extends global_class {
 	protected $prod_price;
 	protected $status;
 	protected $created_at;
-	
-	
+
 	public static function identifiant() {
 		return "id";
 	}
-	
+
 }
-
-

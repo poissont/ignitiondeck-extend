@@ -1228,7 +1228,7 @@ add_shortcode('projet_pourcentrealise', function($args) {
 		$post_id = $project->get_project_postid();
 //		pre($post_id);
 		$pourcent = round(get_post_meta($post_id, "ign_percent_raised")[0] * 1);
-		$ret .= $pourcent . " % récoltés";
+		$ret .= "<div class='projet_pourcentrealise'>".$pourcent . " % récoltés</div>";
 		return $ret;
 	}
 });
@@ -1246,7 +1246,7 @@ add_shortcode('projet_mini_description', function($args) {
 //		pre($desc);
 
 		$ret = "<div class='projet_mini_description'>$desc</div>";
-		return $desc;
+		return $ret;
 	}
 });
 
@@ -1269,7 +1269,6 @@ add_shortcode('projet_etat', function($args) {
 		$annee = $fee[2];
 		$timestamp = mktime(23, 59, 59, $mois, $jour, $annee);
 
-
 		$statut = $encours;
 
 		if ($endifclose && $pourcent >= 100) {
@@ -1281,6 +1280,34 @@ add_shortcode('projet_etat', function($args) {
 		}
 		$ret .= "<div class='projet_etat'>$statut</div>";
 
+		return $ret;
+	}
+});
+
+add_shortcode('projet_categories', function($args) {
+	if (isset($args["product"])) {
+		$ret = "<ul class='projet_categorie'>";
+		$project_id = $args['product'];
+		$project = new ID_Project($project_id);
+		$post_id = $project->get_project_postid();
+
+		$posts = new posts($post_id);
+//		pre($post_id);
+//		$cats = [new terms(15)];
+		$cats = $posts->getCategories(" AND taxonomy = 'project_category'");
+		$limit = false;
+		
+		if (isset($args["limit"])) {
+			$limit = $args["limit"];
+		}
+		$i = 0;
+		foreach ($cats as $cat) {
+			if ($limit === false || $i > $limit) {
+				$ret.= "<li class='projet_categorie-item projet_categorie-" . $cat->slug() . "'>" . $cat->name() . "</li>";
+			}
+			++$i;
+		}
+		$ret.="</ul>";
 		return $ret;
 	}
 });

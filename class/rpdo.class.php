@@ -31,7 +31,7 @@ class cpdo {
 		if (!get_option("bii_use_bddcommunes")) {
 			throw new Exception("Vous essayez d'utiliser la base de données des communes alors qu'elle n'est pas initialisée", "1719");
 		}
-		if (!get_option("bii_host_plugin")||!get_option("bii_name_plugin")||!get_option("bii_user_plugin")||!get_option("bii_pwd_plugin")) {
+		if (!get_option("bii_host_plugin") || !get_option("bii_name_plugin") || !get_option("bii_user_plugin") || !get_option("bii_pwd_plugin")) {
 			throw new Exception("Vous essayez d'utiliser la base de données des communes alors qu'elle n'est pas configurée", "1720");
 		}
 		if (!self::$instance) {
@@ -59,7 +59,7 @@ class ppdo {
 		if (!get_option("bii_use_bddplugin")) {
 			throw new Exception("Vous essayez d'utiliser la base de données du plugin alors qu'elle n'est pas initialisée", "1721");
 		}
-		if (!get_option("bii_host_plugin")||!get_option("bii_name_plugin")||!get_option("bii_user_plugin")||!get_option("bii_pwd_plugin")) {
+		if (!get_option("bii_host_plugin") || !get_option("bii_name_plugin") || !get_option("bii_user_plugin") || !get_option("bii_pwd_plugin")) {
 			throw new Exception("Vous essayez d'utiliser la base de données du plugin alors qu'elle n'est pas configurée", "1722");
 		}
 		if (!self::$instance) {

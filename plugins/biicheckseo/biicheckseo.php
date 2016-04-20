@@ -21,6 +21,6 @@ biicheckseo_enqueueJS();
 
 add_action("bii_informations", function() {
 	?>
-	<tr><td>SEO Debug est  </td><td><?= bii_makebutton("bii_hideseo", 0, 0, true); ?></td></tr>
+		<tr><td>SEO Debug est  </td><td><?= bii_makebutton("bii_hideseo", 0, 0, true); ?></td></tr>
 	<?php
 });

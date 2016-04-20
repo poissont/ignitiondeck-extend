@@ -166,7 +166,6 @@ add_filter('id_funds_raised', 'rfidc_fundraised', 10, 2);
 add_filter('id_display_currency', 'rfidc_see', 10, 2);
 add_filter('the_title', 'rfidc_title_genitif', 10, 2);
 
-
 add_action('after_setup_theme', 'bii_ast');
 
 function bii_ast() {

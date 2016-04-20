@@ -1,5 +1,4 @@
 <?php
-
 /*
   Plugin Name: Biicss
   Description: Ajoute bootstrap et font awesome sur le site et son back office
@@ -23,7 +22,7 @@ add_action('wp_enqueue_scripts', function() {
 	if (get_option("bii_useleftmenu")) {
 		wp_enqueue_script('jquery-effects-core');
 		wp_enqueue_style('leftmenu', plugins_url('css/leftmenu.css', __FILE__));
-		wp_enqueue_script('leftmenuscript', plugins_url('js/leftmenu.js', __FILE__), array('jquery','jquery-ui-core','jquery-effects-core', 'util'), false, true);
+		wp_enqueue_script('leftmenuscript', plugins_url('js/leftmenu.js', __FILE__), array('jquery', 'jquery-ui-core', 'jquery-effects-core', 'util'), false, true);
 	}
 });
 
@@ -33,15 +32,15 @@ add_action("bii_informations", function() {
 	<?php
 });
 
-add_filter("bii_class_menu",function($arg1,$arg2){
+add_filter("bii_class_menu", function($arg1, $arg2) {
 	$class = "";
-	if(get_option("bii_useleftmenu")){
+	if (get_option("bii_useleftmenu")) {
 		$class.="bii-left-menu";
 	}
 	return $class;
-},10,2);
-add_action("between_header_and_containerwrapper",function(){
+}, 10, 2);
+add_action("between_header_and_containerwrapper", function() {
 	?>
 	<div id="bii-overlay"></div>
 	<?php
-},10,2);
+}, 10, 2);

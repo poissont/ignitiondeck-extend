@@ -9,7 +9,6 @@
  */
 define('bii_bdd_version', '1.0');
 
-
 add_action("bii_informations", function() {
 	?>
 	<tr><td>La base de données des communes est  </td><td><?= bii_makebutton("bii_use_bddcommunes", 0, 1); ?></td></tr>
@@ -20,7 +19,7 @@ add_action("bii_options_submit", function() {
 	$tableaucheck = [
 		"bii_host_bddcommunes", "bii_user_bddcommunes", "bii_name_bddcommunes", "bii_pwd_bddcommunes",
 		"bii_host_bddplugin", "bii_user_bddplugin", "bii_name_bddplugin", "bii_pwd_bddplugin",
-		];
+	];
 	foreach ($tableaucheck as $itemtocheck) {
 		if (isset($_POST[$itemtocheck])) {
 			update_option($itemtocheck, $_POST[$itemtocheck]);
