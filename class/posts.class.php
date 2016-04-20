@@ -88,4 +88,18 @@ class posts extends global_class {
 		}
 	}
 
+	public static function currentUserPosts($post_type = "ignition_product") {
+		$user_id = get_current_user_id();
+		if ($user_id) {
+			$where = "post_author = $user_id AND post_status NOT IN ('trash')";
+			if($post_type){
+				$where .= " AND post_type = '$post_type'";
+			}
+			return static::all_id($where);
+			
+		} else {
+			return [];
+		}
+	}
+
 }

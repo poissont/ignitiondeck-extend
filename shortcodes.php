@@ -533,6 +533,7 @@ function id_submissionFormFront($post_id = null) {
 						'post_type' => 'ignition_product',
 						'tax_input' => array('project_category' => $project_category),
 						'comment_status' => $comment_status);
+
 					if (isset($_POST['project_post_id'])) {
 						$args['ID'] = absint($_POST['project_post_id']);
 						$post = get_post($post_id);
@@ -1167,7 +1168,7 @@ add_shortcode('projet_jours_restants', function($args) {
 			if ($dl == 1) {
 				$s = "";
 			}
-			return "$dl jour$s restant$s";
+			return "<div class='projet_jours_restants'>$dl jour$s restant$s</div>";
 		}
 	}
 });
@@ -1190,7 +1191,7 @@ add_shortcode('projet_fonds_sur_but', function($args) {
 			$return_text .= "Objectif de";
 		}
 		$return_text .= " $restants €";
-		return $return_text;
+		return "<div class='projet_fonds_sur_but'>$return_text</div>";
 	}
 });
 add_shortcode('projet_propose_par', function($args) {
@@ -1198,20 +1199,92 @@ add_shortcode('projet_propose_par', function($args) {
 		$project_id = $args['product'];
 		$project = new ID_Project($project_id);
 		$post_id = $project->get_project_postid();
-		$nom = get_post_meta($post_id, "ign_company_name")[0] * 1;
-		$ville = get_post_meta($post_id, "ign_company_location")[0] * 1;
+//		pre($post_id,"green");
+		$nom = get_post_meta($post_id, "ign_company_name")[0];
+		$ville = get_post_meta($post_id, "ign_company_location")[0];
 		$ret = "";
 		if ($nom) {
-			$ret.= "Proposé par $nom ";
+			$ret.= "<div class='projet_propose_par'>Proposé par $nom </div>";
 			if ($ville) {
-				$ret.= "à $ville";
+				$ret.= "<div class='projet_ville'>à $ville</div>";
 			}
 		} elseif ($ville) {
-			$ret.= "Projet sur $ville";
+			$ret.= "<div class='projet_ville'>Projet sur $ville</div>";
 		}
+		return "$ret";
+	}
+});
+
+add_shortcode("projet_jauge", function($args) {
+	if (isset($args["product"])) {
+		return "<div class='projet_jauge'>" . do_shortcode("[project_percentage_bar product='" . $args["product"] . "']") . "</div>";
+	}
+});
+add_shortcode('projet_pourcentrealise', function($args) {
+	if (isset($args["product"])) {
+		$ret = "";
+		$project_id = $args['product'];
+		$project = new ID_Project($project_id);
+		$post_id = $project->get_project_postid();
+//		pre($post_id);
+		$pourcent = round(get_post_meta($post_id, "ign_percent_raised")[0] * 1);
+		$ret .= $pourcent . " % récoltés";
 		return $ret;
 	}
 });
+add_shortcode('projet_mini_description', function($args) {
+	if (isset($args["product"])) {
+		$ret = "";
+		if (!isset($args["cut_at"])) {
+			$args["cut_at"] = 100;
+		}
+		$project_id = $args['product'];
+		$project = new ID_Project($project_id);
+		$post_id = $project->get_project_postid();
+
+		$desc = global_class::tronquer(get_post_meta($post_id, "ign_project_description")[0], $args["cut_at"]);
+//		pre($desc);
+
+		$ret = "<div class='projet_mini_description'>$desc</div>";
+		return $desc;
+	}
+});
+
+add_shortcode('projet_etat', function($args) {
+	if (isset($args["product"])) {
+		$ret = "";
+		$project_id = $args['product'];
+		$project = new ID_Project($project_id);
+		$post_id = $project->get_project_postid();
+		$endifclose = $nom = get_post_meta($post_id, "ign_project_closed")[0];
+		$encours = "en cours";
+		$termine = "terminé";
+		$bientot = "bientôt terminé";
+		$dl = get_post_meta($post_id, "ign_days_left")[0];
+		$pourcent = get_post_meta($post_id, "ign_percent_raised")[0] * 1;
+		$fe = get_post_meta($post_id, "ign_fund_end")[0];
+		$fee = explode("/", $fe);
+		$jour = $fee[1];
+		$mois = $fee[0];
+		$annee = $fee[2];
+		$timestamp = mktime(23, 59, 59, $mois, $jour, $annee);
+
+
+		$statut = $encours;
+
+		if ($endifclose && $pourcent >= 100) {
+			$statut = $termine;
+		} elseif ($timestamp < time()) {
+			$statut = $termine;
+		} elseif ($dl && $dl < 10) {
+			$statut = $bientot;
+		}
+		$ret .= "<div class='projet_etat'>$statut</div>";
+
+		return $ret;
+	}
+});
+
 
 
 add_shortcode('moteur-recherche', 'bii_SC_moteur_recherche');

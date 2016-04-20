@@ -21,7 +21,7 @@
 						<div class="col-xxs-12 pl-zdt bii_option hidden">
 							<h2 class="faa-parent animated-hover"><i class="fa fa-cogs faa-ring"></i> Zone de test</h2>
 							<?php
-							pre(ign_pay_info::nb("product_id = 3"));
+							pre(posts::currentUserPosts());
 							?>
 						</div>
 					<?php } ?>
