@@ -5,6 +5,7 @@ function bii_listeClass() {
 		"rpdo",
 		"global_class",
 		"bii_project",
+		"eg_grids",
 		"terms",
 		"term_taxonomy",
 		"posts",
@@ -163,7 +164,7 @@ function rfidc_status_traduction($lang = "fr-FR") {
 add_filter('id_end_month', 'rfidc_endmonth', 10, 1);
 add_filter('id_project_goal', 'rfidc_goal', 10, 2);
 add_filter('id_funds_raised', 'rfidc_fundraised', 10, 2);
-add_filter('id_display_currency', 'rfidc_see', 10, 2);
+add_filter('id_display_currency', 'rfidc_display_currency', 10, 2);
 add_filter('the_title', 'rfidc_title_genitif', 10, 2);
 
 add_action('after_setup_theme', 'bii_ast');
@@ -394,3 +395,44 @@ add_action("idf_general_social_buttons", function() {
 	</ul>
 	<?php
 });
+add_filter("bii-esg-additional_query", function($additional_query) {
+	if (strpos($additional_query, "bii_currentuserposts") !== false) {
+
+		$imp = implode(",", posts::currentUserPosts());
+		$replace = "array($imp)";
+		$additional_query = str_replace("bii_currentuserposts", $replace, $additional_query);
+	}
+	return $additional_query;
+}, 10, 1);
+
+
+add_filter('essgrid_query_caching', 'eg_stop_caching', 10, 2);
+add_filter('essgrid_get_posts', 'eg_mod_query', 10, 2);
+
+// turn off caching for your grid
+function eg_stop_caching($do_cache, $grid_id) {
+
+	$grid = new eg_grids($grid_id);
+	$handle = $grid->handle();
+
+	if ($handle == 'griduser') {
+		return false;
+	}
+	return true;
+}
+
+function eg_mod_query($query, $grid_id) {
+	$grid = new eg_grids($grid_id);
+	$handle = $grid->handle();
+
+	if ($handle == 'all_projets') {
+		
+	}
+	if ($handle == 'griduser') {
+		$uid = get_current_user_id();
+		$query["author"] = $uid;
+	}
+
+
+	return $query;
+}

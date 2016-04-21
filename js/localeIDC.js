@@ -2,14 +2,20 @@ var currentYear = (new Date).getFullYear();
 var yearstart = 2016;
 
 jQuery(function ($) {
-	if($(".md-requiredlogin.login.pageconnexion")){
+	if ($(".md-requiredlogin.login.pageconnexion")) {
 		$("#containerwrapper").addClass("bii-connexion");
 	}
-	
+
 	$("#project_fesubmit").hide();
 	add_onscreen_to_checkifscroll();
 	$(window).scroll(function () {
 		add_onscreen_to_checkifscroll();
+		checkEEMHeight();
+	});
+	
+	$(".myportfolio-container").on("itemsinposition",function(){
+//		bii_CL("itemsinposition");
+		checkEEMHeight();
 	});
 
 	if ($(".id-widget-date").length) {
@@ -70,8 +76,8 @@ jQuery(function ($) {
 
 	}
 
-	if($("#sidebar").length){
-		if(!bii_showlogs){
+	if ($("#sidebar").length) {
+		if (!bii_showlogs) {
 			$("#sidebar").hide();
 		}
 	}
@@ -133,31 +139,63 @@ jQuery(function ($) {
 						if (regex.test(val)) {
 							++nbpass;
 							$(this).removeClass("invalid");
-						}else{
+						} else {
 							$(this).addClass("invalid");
 						}
-					}else{
+					} else {
 						++nbpass;
 						$(this).removeClass("invalid");
 					}
-				}else{
+				} else {
 					$(this).addClass("invalid");
 				}
 			});
-			if(nbrequired != nbpass){
+			if (nbrequired != nbpass) {
 				e.preventDefault();
-				var nbnotpass = nbrequired-nbpass;
+				var nbnotpass = nbrequired - nbpass;
 				var pluriel = "";
 				var verbe = " n'est";
-				if(nbnotpass > 1){
+				if (nbnotpass > 1) {
 					pluriel = "s";
 					verbe = " ne sont";
 				}
-				alert(nbnotpass+" champ"+pluriel+verbe+" pas correctement renseigné"+pluriel);
+				alert(nbnotpass + " champ" + pluriel + verbe + " pas correctement renseigné" + pluriel);
 			}
 		}
 	});
 
+	
+
+	function checkEEMHeight() {
+
+		if ($(".esg-entry-media").length) {
+			var heighttocheck = 150;
+//			var size = getWindowSize();
+//			if(size == "sm"){
+//				heighttocheck = 150;
+//			}
+//			if(size == "xs"){
+//				heighttocheck = 150;
+//			}
+			
+			$(".esg-entry-media").each(function () {
+				var height = $(this).height();
+				if (height < heighttocheck && height != 0) {
+					var ratio = heighttocheck / height;
+					var width = $(this).width();
+					var newwidth = width * ratio;
+					bii_CL(newwidth);
+					$(this).css("min-height", heighttocheck + "px");
+					$(this).find("img").css({
+						"min-height": heighttocheck + "px",
+						"width": newwidth + "px",
+						"position":"relative",
+						"left":-(newwidth/4)+"px"
+					});
+				}
+			});
+		}
+	}
 	function eventchangeElement($element, string) {
 		if ($element.attr("data-relative")) {
 			var relative = $("#" + $element.attr("data-relative"));

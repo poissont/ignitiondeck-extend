@@ -20,11 +20,7 @@
 						<div class="col-xxs-12 pl-zdt bii_option hidden">
 							<h2 class="faa-parent animated-hover"><i class="fa fa-cogs faa-ring"></i> Zone de test</h2>
 							<?php
-							$posts = new posts(27);
-							pre($posts,'green');
-							$cats = $posts->getCategories(" AND taxonomy = 'project_category'");
-							pre($cats,'red');
-							pre(do_shortcode("[projet_categories product='3']"));
+							
 							?>
 						</div>
 					<?php } ?>

@@ -1150,7 +1150,7 @@ add_shortcode('prequel_supporters', function($args) {
 		if ($nb < 2 && $args["text-singulier"]) {
 			$text = $args["text-singulier"];
 		}
-		return str_replace("%nombre%", $nb, $text);
+		return str_replace("%nombre%", "<span class='value'>" . $nb . "</span>", $text);
 	}
 	return $nb;
 });
@@ -1162,14 +1162,18 @@ add_shortcode('projet_jours_restants', function($args) {
 		$project_id = $args['product'];
 		$project = new ID_Project($project_id);
 		$post_id = $project->get_project_postid();
-		$dl = get_post_meta($post_id, "ign_days_left")[0];
-		if ($dl) {
-			$s = "s";
-			if ($dl == 1) {
-				$s = "";
-			}
-			return "<div class='projet_jours_restants'>$dl jour$s restant$s</div>";
+		$dl = get_post_meta($post_id, "ign_days_left")[0] * 1;
+
+		$s = "s";
+		if ($dl == 1) {
+			$s = "";
 		}
+		if ($dl === 0) {
+
+			$dl = "&infin;";
+			$classspan = "inf";
+		}
+		return "<div class='projet_jours_restants'><span class='value $classspan'>$dl</span><span class='legend'> jour$s restant$s</span></div>";
 	}
 });
 add_shortcode('projet_fonds_sur_but', function($args) {
@@ -1177,20 +1181,14 @@ add_shortcode('projet_fonds_sur_but', function($args) {
 		$project_id = $args['product'];
 		$project = new ID_Project($project_id);
 		$post_id = $project->get_project_postid();
-		$recoltes = get_post_meta($post_id, "ign_fund_raised")[0] * 1;
+//		$recoltes = get_post_meta($post_id, "ign_fund_raised")[0] * 1;
 		$restants = ((int) get_post_meta($post_id, "ign_fund_goal")[0]);
 //		pre("[projet_fonds_sur_but product='$post_id']");
 		$return_text = "";
-		if ($recoltes) {
-			$s = "s";
-			if ($recoltes == 1) {
-				$s = "";
-			}
-			$return_text .= "$recoltes € collecté$s sur";
-		} else {
-			$return_text .= "Objectif de";
-		}
-		$return_text .= " $restants €";
+		$return_text .= "<span class='value restants'>$restants €</span>";
+		$return_text .= "<span class='legend'>Objectif</span>";
+
+
 		return "<div class='projet_fonds_sur_but'>$return_text</div>";
 	}
 });
@@ -1204,12 +1202,12 @@ add_shortcode('projet_propose_par', function($args) {
 		$ville = get_post_meta($post_id, "ign_company_location")[0];
 		$ret = "";
 		if ($nom) {
-			$ret.= "<div class='projet_propose_par'>Proposé par $nom </div>";
+			$ret.= "<div class='projet_propose_par'><span class='legend'>Proposé par </span><span class='value'>$nom</span> </div>";
 			if ($ville) {
-				$ret.= "<div class='projet_ville'>à $ville</div>";
+				$ret.= "<div class='projet_ville'><span class='legend'>à </span><span class='value'>$ville</span></div>";
 			}
 		} elseif ($ville) {
-			$ret.= "<div class='projet_ville'>Projet sur $ville</div>";
+			$ret.= "<div class='projet_ville'><span class='legend'>Projet sur </span><span class='value'>$ville</span></div>";
 		}
 		return "$ret";
 	}
@@ -1228,7 +1226,7 @@ add_shortcode('projet_pourcentrealise', function($args) {
 		$post_id = $project->get_project_postid();
 //		pre($post_id);
 		$pourcent = round(get_post_meta($post_id, "ign_percent_raised")[0] * 1);
-		$ret .= "<div class='projet_pourcentrealise'>".$pourcent . " % récoltés</div>";
+		$ret .= "<div class='projet_pourcentrealise'><span class='value'>" . $pourcent . " %</span><span class='legend'> récoltés</span></div>";
 		return $ret;
 	}
 });
@@ -1245,7 +1243,7 @@ add_shortcode('projet_mini_description', function($args) {
 		$desc = global_class::tronquer(get_post_meta($post_id, "ign_project_description")[0], $args["cut_at"]);
 //		pre($desc);
 
-		$ret = "<div class='projet_mini_description'>$desc</div>";
+		$ret = "<div class='projet_mini_description'><span class='value'>$desc</span></div>";
 		return $ret;
 	}
 });
@@ -1278,7 +1276,7 @@ add_shortcode('projet_etat', function($args) {
 		} elseif ($dl && $dl < 10) {
 			$statut = $bientot;
 		}
-		$ret .= "<div class='projet_etat'>$statut</div>";
+		$ret .= "<div class='projet_etat'><span class='value'>$statut</span></div>";
 
 		return $ret;
 	}
@@ -1296,14 +1294,14 @@ add_shortcode('projet_categories', function($args) {
 //		$cats = [new terms(15)];
 		$cats = $posts->getCategories(" AND taxonomy = 'project_category'");
 		$limit = false;
-		
+
 		if (isset($args["limit"])) {
 			$limit = $args["limit"];
 		}
 		$i = 0;
 		foreach ($cats as $cat) {
 			if ($limit === false || $i > $limit) {
-				$ret.= "<li class='projet_categorie-item projet_categorie-" . $cat->slug() . "'>" . $cat->name() . "</li>";
+				$ret.= "<li class='projet_categorie-item projet_categorie-" . $cat->slug() . "'>" . utf8_encode($cat->name()) . "</li>";
 			}
 			++$i;
 		}

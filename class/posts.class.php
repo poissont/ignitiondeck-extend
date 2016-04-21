@@ -98,7 +98,11 @@ class posts extends global_class {
 			return static::all_id($where);
 			
 		} else {
-			return [];
+			$where = "post_status NOT IN ('trash')";
+			if($post_type){
+				$where .= " AND post_type = '$post_type'";
+			}
+			return static::all_id($where);
 		}
 	}
 	

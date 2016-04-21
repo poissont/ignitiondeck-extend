@@ -1,5 +1,5 @@
 jQuery(function ($) {
-	if (typeof bii_showlogs != 'undefined' && bii_showlogs) {
+//	if (typeof bii_showlogs != 'undefined' && bii_showlogs) {
 
 		$(".menu-toggle").on("click", function () {
 			$("#bii-overlay").addClass("bii-menu-toogle");
@@ -21,5 +21,5 @@ jQuery(function ($) {
 				}
 			});
 		});
-	}
+//	}
 });
