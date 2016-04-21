@@ -1247,6 +1247,22 @@ add_shortcode('projet_mini_description', function($args) {
 		return $ret;
 	}
 });
+add_shortcode('projet_lien_edit', function($args) {
+	if (isset($args["product"])) {
+		$ret = "";
+		if (!isset($args["cut_at"])) {
+			$args["cut_at"] = 100;
+		}
+		$project_id = $args['product'];
+		$project = new ID_Project($project_id);
+		$post_id = $project->get_project_postid();
+		$urlmodif = get_bloginfo("url") . "/modifier-un-projet/?numero_projet=$post_id";
+			$actions = "<a title='Edit Project' href='$urlmodif'>Modifier ce projet <i class='fa fa-edit'></i></a>";
+
+		$ret = "<div class='projet_lien_edit'>$actions</div>";
+		return $ret;
+	}
+});
 
 add_shortcode('projet_etat', function($args) {
 	if (isset($args["product"])) {

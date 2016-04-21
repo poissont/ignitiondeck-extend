@@ -164,6 +164,9 @@ jQuery(function ($) {
 		}
 	});
 
+	$('.esg-selected-filterbutton').on("click",function(){
+		
+	});
 	
 
 	function checkEEMHeight() {
