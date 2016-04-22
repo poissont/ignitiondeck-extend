@@ -3,25 +3,38 @@ jQuery(function () {
 });
 function checkSEO() {
 	if (jQuery("title").length) {
-		bii_CL("TITLE : "+jQuery("title").html());
+		bii_CL("TITLE : " + jQuery("title").html(),'color: green; font-weight: bold;');
 	} else {
-		bii_CL("NO title");
+		bii_CL_error("NO title");
 	}
 	if (jQuery("h1").length) {
-		bii_CL("H1 : "+jQuery("h1").text());
+		var h1text = "";
+		var i = 0;
+		var colst = "";
+		var colen = "";
+		jQuery("h1").each(function () {
+			h1text += colst + jQuery(this).text() + colen;
+			++i;
+
+		});
+		if (i == 1) {
+			bii_CL("H1 : " + h1text,'color: green; font-weight: bold;');
+		}else{
+			bii_CL_error("H1 : " + h1text);
+		}
 	} else {
-		bii_CL("NO h1");
+		bii_CL_error('NO h1');
 	}
 	if (jQuery("meta[name='description']").length) {
-		bii_CL("DESCRIPTION : "+jQuery("meta[name='description']").attr("content"));
+		bii_CL("DESCRIPTION : " + jQuery("meta[name='description']").attr("content"));
 	} else {
-		bii_CL("NO metadescription");
+		bii_CL_error("NO metadescription");
 	}
 	if (jQuery("meta[name='og:description']").length) {
-		bii_CL("OG:DESCRIPTION : "+jQuery("meta[name='og:description']").attr("content"));
+		bii_CL("OG:DESCRIPTION : " + jQuery("meta[name='og:description']").attr("content"));
 	} else {
-		bii_CL("NO meta og:description");
-	}	
+		bii_CL_error("NO meta og:description");
+	}
 }
 jQuery("img").each(function () {
 	if ((typeof jQuery(this).attr("alt") === "undefined") || (jQuery(this).attr("alt") == "")) {

@@ -1,8 +1,21 @@
 var formerzone = zoneFenetre();
 var zonebottomplus = 10;
-function bii_CL(value) {
+function bii_CL(value,css) {
+	var css = css || false;
 	if (typeof bii_showlogs != 'undefined' && bii_showlogs) {
-		console.log(value);
+		if(css){
+			value = "%c "+value;
+			console.log(value,css);
+		}else{
+			console.log(value);
+		}
+		
+	}
+}
+function bii_CL_error(value) {
+	if (typeof bii_showlogs != 'undefined' && bii_showlogs) {
+		value = "%c "+value;
+		console.log(value,'color: red; font-weight: bold;');
 	}
 }
 function zoneFenetre() {

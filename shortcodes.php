@@ -1135,6 +1135,44 @@ function bii_SC_Project_Supporters($args) {
 	return $nb;
 }
 
+function bii_SC_id_purchaseForm($attrs) {
+	ob_start();
+	require '/var/www/upyourtown/wp-content/plugins/ignitiondeck-crowdfunding/languages/text_variables.php';
+	if (isset($attrs['product'])) {
+		$project_id = absint($attrs['product']);
+	}
+	if (isset($_GET['prodid'])) {
+		$project_id = absint($_GET['prodid']);
+		
+	}
+	if (isset($_GET['level'])) {
+		$level = absint($_GET['level']);
+	}
+
+	if (isset($project_id)) {
+		$form = new ID_Purchase_Form($project_id);
+		$purchase_form = $form->id_purchase_form();
+		$post_id = $purchase_form->post_id;
+	}
+	else {
+		$project_id = null;
+	}
+
+	if (!isset($_SESSION['paypal_errors_content'])) {
+		$_SESSION['paypal_errors_content'] = "";
+	}
+	if (empty($purchase_form->form_settings) || empty($purchase_form->form_settings['email'])) {
+		$_SESSION['paypal_errors_content'] = __('The email field must be enabled via the project settings menu.', 'ignitiondeck');
+	}
+	include IDCE_PATH . '/templates/_purchaseForm.php';
+	$purchase_form = ob_get_contents();
+	ob_end_clean();
+	$purchase_form = apply_filters('id_purchase_form', $purchase_form, $project_id);
+	return $purchase_form;
+}
+remove_shortcode('project_purchase_form');
+add_shortcode('project_purchase_form', 'bii_SC_id_purchaseForm');
+
 add_shortcode('project_grid_responsive', 'id_projectGrid_responsive');
 add_shortcode('jordan', "rev_slider_alias_homeslider");
 add_shortcode('rev_slider_alias_homeslider', "rev_slider_alias_homeslider");

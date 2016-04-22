@@ -164,6 +164,35 @@ jQuery(function ($) {
 		}
 	});
 
+	if ($("#level_select").length) {
+		$('#level_select').ddslick('destroy');
+//		$(".dd-option-text").on("click",function(){
+//			var valprice = $(this).siblings(".dd-option-price").val();
+//			bii_CL(valprice);
+//			if(valprice == ""){
+//				$("#form_prix").attr("type","number");
+//			}else{
+//				$("#form_prix").attr("type","hidden");
+//			}
+//		});
+		$('#level_select').ddslick({
+			selectText: "Choisissez votre contrepartie",
+			onSelected: function (selectedData) {
+				//callback function: do something with selectedData;
+//				console.log(selectedData);
+				price = selectedData['selectedData']['price'];
+				desc = selectedData['selectedData']['description'];
+				selLevel = selectedData['selectedData']['value'];
+				$(document).trigger('levelChange', price);
+				$('.preorder-form-product-price').text(price);
+				$('.id-checkout-level-desc').html(desc);
+				$('input[name="price"]').val(price);
+				$('input[name="desc"]').val(desc);
+				$('input[name="level"]').val(selLevel);
+			}
+		});
+	}
+
 	function checkEEMHeight() {
 
 		if ($(".esg-entry-media").length) {
