@@ -1,8 +1,8 @@
 <?php
 $projects = getProjectsPublish();
 $nb_projets = count($projects);
-foreach($projects as $id_project){
-	if(get_post_status($id_project) !== false){
+foreach ($projects as $id_project) {
+	if (get_post_status($id_project) !== false) {
 		$id_lastprojet = $id_project;
 	}
 }
@@ -44,7 +44,7 @@ $funds_goal = getFundsGoal();
 
 				</div>
 			</div>
-			</div>
+
 			<div class="md-dash-sidebar">
 				<ul>
 					<?php ( function_exists('dynamic_sidebar') ? dynamic_sidebar('dashboard-sidebar') : ''); ?>
@@ -57,7 +57,7 @@ $funds_goal = getFundsGoal();
 		<li class="md-box">
 			Nombre de projets en attente  : <?= $nb_projetspending; ?>
 		</li>
-		
+
 		<li class="md-box">
 			Titre du dernier projet publié : <?= $titre_lastprojet; ?></li>
 		</li>
