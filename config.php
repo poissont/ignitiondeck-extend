@@ -430,7 +430,11 @@ function eg_mod_query($query, $grid_id) {
 	}
 	if ($handle == 'griduser') {
 		$uid = get_current_user_id();
-		$query["author"] = $uid;
+		if ($uid) {
+			$query["author"] = $uid;
+		}else{
+			$query["author_name"] = "none";
+		}
 	}
 
 

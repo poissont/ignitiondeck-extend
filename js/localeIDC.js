@@ -12,8 +12,8 @@ jQuery(function ($) {
 		add_onscreen_to_checkifscroll();
 		checkEEMHeight();
 	});
-	
-	$(".myportfolio-container").on("itemsinposition",function(){
+
+	$(".myportfolio-container").on("itemsinposition", function () {
 //		bii_CL("itemsinposition");
 		checkEEMHeight();
 	});
@@ -164,11 +164,6 @@ jQuery(function ($) {
 		}
 	});
 
-	$('.esg-selected-filterbutton').on("click",function(){
-		
-	});
-	
-
 	function checkEEMHeight() {
 
 		if ($(".esg-entry-media").length) {
@@ -180,7 +175,7 @@ jQuery(function ($) {
 //			if(size == "xs"){
 //				heighttocheck = 150;
 //			}
-			
+
 			$(".esg-entry-media").each(function () {
 				var height = $(this).height();
 				if (height < heighttocheck && height != 0) {
@@ -192,8 +187,8 @@ jQuery(function ($) {
 					$(this).find("img").css({
 						"min-height": heighttocheck + "px",
 						"width": newwidth + "px",
-						"position":"relative",
-						"left":-(newwidth/4)+"px"
+						"position": "relative",
+						"left": -(newwidth / 4) + "px"
 					});
 				}
 			});

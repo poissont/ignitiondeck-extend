@@ -3,11 +3,11 @@
 /*
   Plugin Name: Ignitiondeck-extend
   Description: Ignitiondeck-extend - Initiondesk Extension for better languages and shortcodes
-  Version: 0.8.5
+  Version: 0.8.6
   Author: BiilinkAgency
  */
 
-define('IDCExtend_version', '0.8.5');
+define('IDCExtend_version', '0.8.6');
 define('IDCE_PATH', plugin_dir_path(__FILE__));
 
 define('Bii_plugin_slug',"Biilinkplugin");

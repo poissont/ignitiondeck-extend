@@ -1059,17 +1059,18 @@ function bii_SC_projet_mini($attrs) {
 }
 
 function bii_SC_projets_all($attrs) {
-	if ($_SERVER["REMOTE_ADDR"] == "77.154.194.84") {
-		$projects = getProjects();
-		global $current_user;
-		if ($current_user->ID) {
+	if ($_SERVER["REMOTE_ADDR"] == "77.154.194.84") {		
+//		pre(get_current_user_id());
+		if (get_current_user_id()) {
+			$projects = getProjects();
 			if ((bool) $projects) {
 
-				$output = "";
-				foreach ($projects as $key => $id) {
-					$array = ["id" => $id, "nobootsrap" => "1"];
-					$output .= bii_SC_projet_mini($array);
-				}
+//				$output = "";
+//				foreach ($projects as $key => $id) {
+//					$array = ["id" => $id, "nobootsrap" => "1"];
+//					$output .= bii_SC_projet_mini($array);
+//				}
+				$output = do_shortcode('[ess_grid alias="griduser"]');
 				return $output;
 			} else {
 				$output = '<div class="ignitiondeck"><p class="notification orange">Vous n\'avez pas encore de projets !<br />'
