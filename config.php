@@ -220,20 +220,16 @@ function bii_dashboard() {
 	include('admin/dashboard.php');
 }
 
-function bii_ajax_changewpoption() {
-	include("ajax/ajax_change_wp_option.php");
+function bii_add_new_level_ajax() {
+	include("ajax/ajax_add_new_level.php");
 	die();
 }
 
-function bii_get_post_ajax() {
-	include("ajax/getPost.php");
-	die();
-}
 
-add_action('wp_ajax_bii_get_post', 'bii_get_post_ajax');
 add_action('wp_ajax_nopriv_bii_get_post', 'bii_get_post_ajax');
+add_action('wp_ajax_bii_add_new_level', 'bii_add_new_level_ajax');
+add_action('wp_ajax_nopriv_bii_add_new_level', 'bii_add_new_level_ajax');
 
-add_action('wp_ajax_bii_change_wp_option', 'bii_ajax_changewpoption');
 
 function bii_dashboard_button_main() {
 	$array_active = ["désactivé", "activé"];

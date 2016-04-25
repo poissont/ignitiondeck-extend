@@ -6,48 +6,171 @@ jQuery(function ($) {
 		$("#containerwrapper").addClass("bii-connexion");
 	}
 
-	$("#project_fesubmit").hide();
+
 	add_onscreen_to_checkifscroll();
 	$(window).scroll(function () {
 		add_onscreen_to_checkifscroll();
 		checkEEMHeight();
 	});
 
+	if ($("#project_fesubmit").length) {
+		//Page de soumission des projets		
+		$("#project_fesubmit, .remove-level, .formlevels ").hide();
+
+
+		if ($(".id-widget-date").length) {
+			$(".id-widget-date").each(function () {
+				var $month = $(this).find(".id-widget-month");
+				var $year = $(this).find(".id-widget-year");
+				var $day = $(this).find(".id-widget-day");
+				$(this).html("");
+				$(this).append($day).append($month).append($year);
+			});
+		}
+		if ($(".ign-project-end").length) {
+			$(".ign-project-end").each(function () {
+				var text = $(this).text();
+				var mots = text.split(" ");
+				var textrepl = "";
+				var motreplace = "texttoreplace";
+				$.each(mots, function (indexInArray, mot) {
+					if (mot.indexOf("/") != -1) {
+//					console.log(mot);
+						motreplace = mot;
+						var exp = mot.split("/");
+						var mois = exp[0];
+						var jour = exp[1];
+						var annee = exp[2];
+						textrepl = jour + " " + mois + " " + annee;
+					}
+				});
+				$(this).text(text.replace(motreplace, textrepl));
+			});
+//		$date.html("");
+		}
+
+		if ($(".datepicker").length) {
+			$(".datepicker").on("click change input load blur", function () {
+				eventchangeElement($(this), $(this).val());
+			});
+			$(".datepicker").datepicker({
+				firstDay: 1,
+				closeText: 'Fermer',
+				prevText: '',
+				nextText: '',
+				currentText: 'Aujourd\'hui',
+				monthNames: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'],
+				monthNamesShort: ['Janv.', 'Févr.', 'Mars', 'Avril', 'Mai', 'Juin', 'Juil.', 'Août', 'Sept.', 'Oct.', 'Nov.', 'Déc.'],
+				dayNames: ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'],
+				dayNamesShort: ['Dim.', 'Lun.', 'Mar.', 'Mer.', 'Jeu.', 'Ven.', 'Sam.'],
+				dayNamesMin: ['Dim.', 'Lun.', 'Mar.', 'Mer.', 'Jeu.', 'Ven.', 'Sam.'],
+				dateFormat: 'dd/mm/yy',
+				defaultDate: new Date(),
+				beforeShow: function () {
+					$('#ui-datepicker-div').addClass("bii-datepicker");
+				},
+				onSelect: function (string) {
+//				console.log(string);
+					eventchangeElement($(this), string);
+				}
+			});
+		}
+
+		$('#CGU').on("click", function () {
+			if ($(this).is(':checked')) {
+				$("#project_fesubmit").show();
+			} else {
+				$("#project_fesubmit").hide();
+			}
+		});
+		$('#uselevels').on("click", function () {
+			if ($(this).is(':checked')) {
+				$(".formlevels").show();
+			} else {
+				$(".formlevels").hide();
+			}
+		});
+
+		$("#fes").on("submit", function (e) {
+			if (!$('#CGU').is(':checked')) {
+				e.preventDefault();
+			} else {
+				var nbrequired = 0;
+				var nbpass = 0;
+				$(this).find(".required").each(function () {
+					++nbrequired;
+					var val = $(this).val().trim();
+					if (val) {
+						if ($(this).attr("data-pattern")) {
+							var pattern = $(this).attr("data-pattern");
+							var regex = new RegExp(pattern);
+							if (regex.test(val)) {
+								++nbpass;
+								$(this).removeClass("invalid");
+							} else {
+								$(this).addClass("invalid");
+							}
+						} else {
+							++nbpass;
+							$(this).removeClass("invalid");
+						}
+					} else {
+						$(this).addClass("invalid");
+					}
+				});
+				if (nbrequired != nbpass) {
+					e.preventDefault();
+					var nbnotpass = nbrequired - nbpass;
+					var pluriel = "";
+					var verbe = " n'est";
+					if (nbnotpass > 1) {
+						pluriel = "s";
+						verbe = " ne sont";
+					}
+					alert(nbnotpass + " champ" + pluriel + verbe + " pas correctement renseigné" + pluriel);
+				}
+			}
+		});
+
+		$(".formlevels .add-level").on("click", function (e) {
+			e.preventDefault();
+			//bii_add_new_level
+			var index = $("#product_level_count").val() * 1 + 1;
+			jQuery.ajax({
+				url: ajaxurl,
+				type: 'POST',
+				data: {action: 'bii_add_new_level', index: index},
+				success: function (newlevel) {
+					$(".container-levels").prepend(newlevel);
+					$(".container-levels .otherform:first-of-type").hide();
+					$("#product_level_count").val(index);
+					$(".remove-level").show();
+					$(".container-levels .otherform:first-of-type").show(700);
+				}
+			});
+		});
+		$(".formlevels .remove-level").on("click", function (e) {
+			e.preventDefault();
+			var index = $("#product_level_count").val() * 1 - 1;
+			$("#product_level_count").val(index);
+			$(".container-levels .otherform:first-of-type").hide(500,function(){
+				$(this).remove();
+			});
+			
+			if (index == 1) {
+				$(".remove-level").hide();
+			}
+		});
+
+
+		//FIN Page de soumission des projets	
+	}
 	$(".myportfolio-container").on("itemsinposition", function () {
 //		bii_CL("itemsinposition");
 		checkEEMHeight();
 	});
 
-	if ($(".id-widget-date").length) {
-		$(".id-widget-date").each(function () {
-			var $month = $(this).find(".id-widget-month");
-			var $year = $(this).find(".id-widget-year");
-			var $day = $(this).find(".id-widget-day");
-			$(this).html("");
-			$(this).append($day).append($month).append($year);
-		});
-	}
-	if ($(".ign-project-end").length) {
-		$(".ign-project-end").each(function () {
-			var text = $(this).text();
-			var mots = text.split(" ");
-			var textrepl = "";
-			var motreplace = "texttoreplace";
-			$.each(mots, function (indexInArray, mot) {
-				if (mot.indexOf("/") != -1) {
-//					console.log(mot);
-					motreplace = mot;
-					var exp = mot.split("/");
-					var mois = exp[0];
-					var jour = exp[1];
-					var annee = exp[2];
-					textrepl = jour + " " + mois + " " + annee;
-				}
-			});
-			$(this).text(text.replace(motreplace, textrepl));
-		});
-//		$date.html("");
-	}
+
 	if ($(".product-author-details").length) {
 		$(".product-author-details").each(function () {
 			var html = $(this).html();
@@ -88,109 +211,115 @@ jQuery(function ($) {
 	}
 
 
-	if ($(".datepicker").length) {
-		$(".datepicker").on("click change input load blur", function () {
-			eventchangeElement($(this), $(this).val());
-		});
-		$(".datepicker").datepicker({
-			firstDay: 1,
-			closeText: 'Fermer',
-			prevText: '',
-			nextText: '',
-			currentText: 'Aujourd\'hui',
-			monthNames: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'],
-			monthNamesShort: ['Janv.', 'Févr.', 'Mars', 'Avril', 'Mai', 'Juin', 'Juil.', 'Août', 'Sept.', 'Oct.', 'Nov.', 'Déc.'],
-			dayNames: ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'],
-			dayNamesShort: ['Dim.', 'Lun.', 'Mar.', 'Mer.', 'Jeu.', 'Ven.', 'Sam.'],
-			dayNamesMin: ['Dim.', 'Lun.', 'Mar.', 'Mer.', 'Jeu.', 'Ven.', 'Sam.'],
-			dateFormat: 'dd/mm/yy',
-			defaultDate: new Date(),
-			beforeShow: function () {
-				$('#ui-datepicker-div').addClass("bii-datepicker");
-			},
-			onSelect: function (string) {
-//				console.log(string);
-				eventchangeElement($(this), string);
-			}
-		});
-	}
-
-	$('#CGU').on("click", function () {
-		if ($(this).is(':checked')) {
-			$("#project_fesubmit").show();
-		} else {
-			$("#project_fesubmit").hide();
-		}
-	});
-
-	$("#fes").on("submit", function (e) {
-		if (!$('#CGU').is(':checked')) {
-			e.preventDefault();
-		} else {
-			var nbrequired = 0;
-			var nbpass = 0;
-			$(this).find(".required").each(function () {
-				++nbrequired;
-				var val = $(this).val().trim();
-				if (val) {
-					if ($(this).attr("data-pattern")) {
-						var pattern = $(this).attr("data-pattern");
-						var regex = new RegExp(pattern);
-						if (regex.test(val)) {
-							++nbpass;
-							$(this).removeClass("invalid");
-						} else {
-							$(this).addClass("invalid");
-						}
-					} else {
-						++nbpass;
-						$(this).removeClass("invalid");
-					}
-				} else {
-					$(this).addClass("invalid");
-				}
-			});
-			if (nbrequired != nbpass) {
-				e.preventDefault();
-				var nbnotpass = nbrequired - nbpass;
-				var pluriel = "";
-				var verbe = " n'est";
-				if (nbnotpass > 1) {
-					pluriel = "s";
-					verbe = " ne sont";
-				}
-				alert(nbnotpass + " champ" + pluriel + verbe + " pas correctement renseigné" + pluriel);
-			}
-		}
-	});
-
-	if ($("#level_select").length) {
+	if ($("#form_pay").length) {
 		$('#level_select').ddslick('destroy');
-//		$(".dd-option-text").on("click",function(){
-//			var valprice = $(this).siblings(".dd-option-price").val();
-//			bii_CL(valprice);
-//			if(valprice == ""){
-//				$("#form_prix").attr("type","number");
-//			}else{
-//				$("#form_prix").attr("type","hidden");
-//			}
-//		});
+		
+		$('input[name="price"]').unbind("change",false);
+		$('input[name="price"]').on("click keyup keydown change", function () {
+			$(this).removeClass("red-border");
+		});
 		$('#level_select').ddslick({
 			selectText: "Choisissez votre contrepartie",
 			onSelected: function (selectedData) {
 				//callback function: do something with selectedData;
 //				console.log(selectedData);
 				price = selectedData['selectedData']['price'];
+				var pricenb = price;
+				bii_CL(pricenb);
+				if (isNaN(pricenb)) {
+					bii_CL("nan");
+					pricenb = 1;
+					$('input[name="price"]').attr("type", "number");
+					$('.preorder-form-product-price').text("");
+				} else {
+					bii_CL("ian");
+					$('input[name="price"]').val(price);
+					$('input[name="price"]').attr("type", "hidden");
+					$('.preorder-form-product-price').text(price);
+				}
+				$('input[name="price"]').removeClass("red-border");
+
 				desc = selectedData['selectedData']['description'];
 				selLevel = selectedData['selectedData']['value'];
 				$(document).trigger('levelChange', price);
-				$('.preorder-form-product-price').text(price);
+
+
 				$('.id-checkout-level-desc').html(desc);
-				$('input[name="price"]').val(price);
+
+
 				$('input[name="desc"]').val(desc);
 				$('input[name="level"]').val(selLevel);
 			}
 		});
+		$("#form_pay").on("submit", function (e) {
+			var ddtext = $(".dd-selected-text").text();
+			alert(ddtext);
+			if (!ddtext.indexOf("Montant Libre")) {
+
+			} else {
+				if (!$('input[name="price"]').val()) {
+					$('input[name="price"]').addClass("red-border");
+				} else {
+					$('input[name="price"]').remove("red-border");
+				}
+			}
+			e.preventDefault();
+		});
+	}
+
+	//Overrides checkIgnitionDeckForm() by bii_checkIgnitionDeckForm
+	window.checkIgnitionDeckForm = function () {
+		return bii_checkIgnitionDeckForm.apply(this, arguments);
+	};
+
+	function bii_checkIgnitionDeckForm(formId, type, level, post_id, project, url) {
+		var keys = [{
+				'level': level,
+				'post_id': post_id,
+				'project': project}];
+		if (type !== 'pwyw') {
+			jQuery.ajax({
+				url: url + 'wp-admin/admin-ajax.php',
+				type: 'POST',
+				data: {action: 'id_validate_price', Keys: keys},
+				success: function (res) {
+					//console.log(res);
+					jQuery('input[name="price"]').val(res);
+				}
+			});
+		}
+
+		//clear previous results
+		jQuery('#' + formId + ' .required').removeClass('red-border');
+		jQuery('#' + formId + ' .form-item-error-msg').remove();
+
+
+		var result = true;
+		jQuery('#' + formId + ' .required').each(function () {
+			if (isEmpty(this)) {
+				console.log(this);
+				jQuery(this).addClass('red-border');
+				jQuery(this).after('<span class="form-item-error-msg"> requis </span>');
+
+				if (result) {
+					result = !result;
+				}
+			}
+		});
+
+		if (jQuery('#' + formId + ' .email').length > 0) {
+			if (!isEmail(jQuery('#' + formId + ' .email').val())) {
+				console.log('email error, email field: ', '#' + formId + ' .email');
+				jQuery('#' + formId + ' .email').addClass('red-border');
+				jQuery('#' + formId + ' .email').after('<span class="form-item-error-msg"> invalide </span>');
+
+				if (result) {
+					result = !result;
+				}
+			}
+		}
+		//console.log(result);
+		return result;
 	}
 
 	function checkEEMHeight() {

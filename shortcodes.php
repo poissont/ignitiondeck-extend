@@ -475,7 +475,7 @@ function id_submissionFormFront($post_id = null) {
 					if (isset($_POST['project_fund_type'])) {
 						array_pop($_POST['project_fund_type']);
 					}
-					for ($i = 0, $j = 0; $i <= $project_levels - 1; $i++) {
+					for ($i = 0, $j = 0; $i <= $project_levels ; $i++) {
 						$saved_levels[$i] = array();
 						if (isset($_POST['project_level_title'][$i])) {
 							$saved_levels[$i]['title'] = $_POST['project_level_title'][$i];

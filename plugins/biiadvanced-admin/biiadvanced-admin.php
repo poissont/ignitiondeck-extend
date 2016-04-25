@@ -3,12 +3,12 @@
 /*
   Plugin Name: Biiadvanced-admin
   Description: Ajoute des fonctionnalités dans l'interface d'admin
-  Version: 1.0
+  Version: 1.1
   Author: Biilink Agency
   Author URI: http://biilink.com/
   License: GPL2
  */
-define('bii_advancedadmin_version', '1.0');
+define('bii_advancedadmin_version', '1.1');
 
 function bii_enqueueJSAdmin($hook) {
 	wp_enqueue_media();
@@ -18,10 +18,23 @@ function bii_enqueueJSAdmin($hook) {
 	wp_enqueue_script('jquery-ui-core');
 	wp_enqueue_script('jquery-ui-autocomplete');
 	wp_enqueue_script('jquery-ui-datepicker');
-	wp_enqueue_script('customscriptadmin', plugins_url('js/admin.js', __FILE__), array('jquery'), false, true);
+	wp_enqueue_script('bii_advanced-admin', plugins_url('js/admin.js', __FILE__), array('jquery'), false, true);
 }
 
 add_action('admin_enqueue_scripts', 'bii_enqueueJSAdmin');
+
+
+function bii_get_post_ajax() {
+	include("ajax/getPost.php");
+	die();
+}
+
+function bii_ajax_changewpoption() {
+	include("ajax/ajax_change_wp_option.php");
+	die();
+}
+add_action('wp_ajax_bii_get_post', 'bii_get_post_ajax');
+add_action('wp_ajax_bii_change_wp_option', 'bii_ajax_changewpoption');
 
 function bii_get_attachment_id_from_url($attachment_url = '') {
 	global $wpdb;

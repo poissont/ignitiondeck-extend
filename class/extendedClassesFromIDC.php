@@ -56,21 +56,24 @@ class bii_ID_FES extends ID_FES {
 	}
 
 	function display_form_short() {
-//		$id_form = new bii_ID_Form($this->form_short());
-//
-//		$output = $id_form->build_form($this->vars);
-//		return $output;
-		ob_start();
-		if (isset($_GET["numero_projet"])) {
-			$np = $_GET["numero_projet"];
-			$bp = bii_project::fromIdPost($np);			
-		}else{
-			$bp = new bii_project();			
+		if (0) {
+			$id_form = new bii_ID_Form($this->form_short());
+
+			$output = $id_form->build_form($this->vars);
+			return $output;
+		} else {
+			ob_start();
+			if (isset($_GET["numero_projet"])) {
+				$np = $_GET["numero_projet"];
+				$bp = bii_project::fromIdPost($np);
+			} else {
+				$bp = new bii_project();
+			}
+			$bp->form_edit_front();
+			$contents = ob_get_contents();
+			ob_end_clean();
+			return $contents;
 		}
-		$bp->form_edit_front();
-		$contents = ob_get_contents();
-		ob_end_clean();
-		return $contents;
 	}
 
 }
@@ -250,7 +253,5 @@ class bii_ID_Form extends ID_Form {
 		$output .= '</ul>';
 		return $output;
 	}
-
-	
 
 }

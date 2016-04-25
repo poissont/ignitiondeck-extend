@@ -57,11 +57,60 @@ class bii_project extends global_class {
 		<?php
 	}
 
+	function header_form_front_levels($text) {
+		?>
+		<div class="vc_col-xs-12">
+			<h3><label for="uselevels"><?= $text; ?> </label><input type="checkbox" id="uselevels" /></h3>
+			<div class="formlevels">
+				<div class="level-controls">
+					<input id="product_level_count" name="product_level_count" type="hidden" value="1" />
+					<button class="add-level">Ajouter une contrepartie</button>
+					<button class="remove-level">Retirer la dernière contrepartie</button>
+
+				</div>
+				<div class="container-levels">
+
+					<?php
+				}
+
+				function otherlevel_header($i = 1) {
+					?>
+					<div class="otherform">
+						<h4>Niveau <?= $i; ?> de contrepartie</h4>
+						<?php
+					}
+
+					function otherlevel_footer() {
+						?>
+					</div>
+
+					<?php
+				}
+
+				function footer_form_front_levels($method) {
+					?>
+				</div>
+				<div class="dropzone-levels"></div>
+				<div class="firstform">
+					<h4>Don de base</h4>
+					<?php
+					$infos = $this->$method();
+
+					foreach ($infos as $prop => $val) {
+						$this->input_front($prop, $val);
+					}
+					?>
+				</div>
+			</div>
+		</div>
+		<?php
+	}
+
 	function prop_infos_entr() {
 		$array = [
 			"company_name" => ["value" => $this->company_name, "label" => "Nom de l'entreprise", "class_input" => "required"],
 			"company_logo" => ["value" => $this->company_logo, "label" => "Votre logo", "input" => "file", "class" => "vc_col-xs-12 col-xs-12 vc_col-sm-5"],
-			"company_location" => ["value" => $this->company_location, "label" => "Ville", "input" => "textarea", "class" => "vc_col-xs-12 col-xs-12 vc_col-sm-7","class_input" => "required"],
+			"company_location" => ["value" => $this->company_location, "label" => "Ville", "input" => "textarea", "class" => "vc_col-xs-12 col-xs-12 vc_col-sm-7", "class_input" => "required"],
 			"company_url" => ["value" => $this->company_url, "label" => "Url de l'entreprise"],
 			"company_fb" => ["value" => $this->company_fb, "label" => "Profil facebook", "class" => "vc_col-xs-12 col-xs-12 vc_col-sm-6"],
 			"company_twitter" => ["value" => $this->company_twitter, "label" => "Profil twitter", "class" => "vc_col-xs-12 col-xs-12 vc_col-sm-6"],
@@ -119,7 +168,25 @@ class bii_project extends global_class {
 	}
 
 	function prop_levels() {
-		return [];
+		$array = [
+			"project_level_title[0]" => ["value" => "Don", "label" => "Titre de la contrepartie", "readonly" => true,],
+			"project_level_price[0]" => ["value" => 0, "label" => "Somme à verser", "class" => "vc_col-xs-12 col-xs-12 vc_col-sm-6 col-sm-6 ", "readonly" => true,],
+			"project_level_limit[0]" => ["value" => 0, "label" => "Nombre maximum de contreparties", "class" => "vc_col-xs-12 col-xs-12 vc_col-sm-6 col-sm-6 ", "readonly" => true,],
+			"level_description[0]" => ["value" => "", "label" => "Description courte", "input" => "text", "readonly" => true,],
+			"level_long_description[0]" => ["value" => "Don Libre, sans contrepartie", "label" => "Description longue", "input" => "text", "readonly" => true,],
+		];
+		return $array;
+	}
+
+	static function prop_newlevel($i = 1) {
+		$array = [
+			"project_level_title[$i]" => ["value" => "", "label" => "Titre de la contrepartie", "type" => "text", "description" => "Vous pouvez choisir de récompenser les donateurs, à partir d'une certaine somme, ou de récompenser les premiers !"],
+			"project_level_price[$i]" => ["value" => 0, "label" => "Somme à verser", "class" => "vc_col-xs-12 col-xs-12 vc_col-sm-6 col-sm-6 ", "type" => "number", "description" => "Entrez le montant à partir duquel vous souhaitez appliquer cette récompense"],
+			"project_level_limit[$i]" => ["value" => 0, "label" => "Nombre maximum de contreparties", "class" => "vc_col-xs-12 col-xs-12 vc_col-sm-6 col-sm-6 ", "type" => "number", "description" => "Entrez le nombre limite de donateurs pour cette récompense"],
+			"level_description[$i]" => ["value" => "", "label" => "Description courte", "input" => "textarea", "description" => "S'affiche dans la liste"],
+			"level_long_description[$i]" => ["value" => "", "label" => "Description longue", "input" => "textarea", "description" => "S'affiche en détail sur le côté"],
+		];
+		return $array;
 	}
 
 	function form_edit_front() {
@@ -127,11 +194,13 @@ class bii_project extends global_class {
 		$this->form_edit_section("Informations sur le projet", "prop_infos");
 		$this->form_edit_section("Détails du projet", "prop_detail");
 		$this->form_edit_section("Images du projet", "prop_images");
-//		$this->form_edit_section("Niveaux de récompenses", "prop_levels");
+		if (bii_canshow_debug()) {
+			$this->form_edit_levels("Voulez vous utiliser des contreparties ? ", "prop_levels");
+		}
 		$this->inputCGU();
 		$this->input_front("", ["input" => "submit"]);
 
-//		pre($this);
+		pre($this);
 	}
 
 	function form_edit_section($titre, $method) {
@@ -141,6 +210,25 @@ class bii_project extends global_class {
 			$this->input_front($prop, $val);
 		}
 		static::footer_form_front();
+	}
+
+	function form_edit_levels($titre, $method) {
+		$this->header_form_front_levels($titre);
+		$this->otherlevel_header(1);
+		$infos = static::prop_newlevel(1);
+		foreach ($infos as $prop => $val) {
+			$this->input_front($prop, $val);
+		}
+		static::footer_form_front_levels($method);
+	}
+
+	function newformlevel($index = 1) {
+		$this->otherlevel_header($index);
+		$infos = static::prop_newlevel($index);
+		foreach ($infos as $prop => $val) {
+			$this->input_front($prop, $val);
+		}
+		$this->otherlevel_footer();
 	}
 
 	function inputCGU() {
@@ -171,6 +259,9 @@ class bii_project extends global_class {
 		if (!isset($val["label"]) || !$val["label"]) {
 			$val["label"] = $name;
 		}
+		if (!isset($val["description"]) || !$val["description"]) {
+			$val["description"] = "";
+		}
 		if (!isset($val["class_input"])) {
 			$val["class_input"] = "";
 		}
@@ -185,26 +276,32 @@ class bii_project extends global_class {
 			}
 			?>
 			<div class="<?= $val["class"]; ?>">
-				<label for="<?= $namelabel ?>"><?= $val["label"]; ?></label>
-
-				<?php
+				<label for="<?= $namelabel ?>" title="<?= $val["description"] ?>"><?= $val["label"]; ?> 
+					<?php
+					if ($val["description"]) {
+						?><span class="fa fa-info-circle toogle-information" ></span><?php
+					}
+					?></label><?php
 			}
 			$otherfields = "";
 			if ($val["input"] == "file") {
 				$otherfields = 'accept="image/*"';
 				if ($val["value"]) {
 					?><div style="background-image: url('<?= $val["value"]; ?>');background-repeat: no-repeat; background-size: 150px auto;" class="project-thumb image"></div><?php
+					}
 				}
-			}
-			if(isset($val["data-pattern"]) && $val["data-pattern"]){
-				$otherfields.= " data-pattern='".$val["data-pattern"]."'";
-			}
-			
-			if ($val["input"] == "number") {
-				$otherfields = "min='" . $val["min"] . "' step='" . $val["step"] . "'";
-			}
-			if ($val["input"] == "textarea") {
-				?><textarea id="<?= $name ?>" name="<?= $name ?>" class="<?= $val["class_input"] ?>" ><?= $val["value"] ?></textarea><?php
+				if (isset($val["data-pattern"]) && $val["data-pattern"]) {
+					$otherfields.= " data-pattern='" . $val["data-pattern"] . "'";
+				}
+				if (isset($val["readonly"]) && $val["readonly"]) {
+					$otherfields.= " readonly='readonly'";
+				}
+
+				if ($val["input"] == "number") {
+					$otherfields = "min='" . $val["min"] . "' step='" . $val["step"] . "'";
+				}
+				if ($val["input"] == "textarea") {
+					?><textarea id="<?= $name ?>" name="<?= $name ?>" class="<?= $val["class_input"] ?>" ><?= $val["value"] ?></textarea><?php
 			} elseif ($val["input"] == "select") {
 				?><select id="<?= $name ?>" name="<?= $name ?>" class="<?= $val["class_input"] ?>" ><?php
 						foreach ($val["options"] as $value => $display_value) {
@@ -226,9 +323,7 @@ class bii_project extends global_class {
 			} else {
 				?><input id="<?= $name ?>" type="<?= $val["input"] ?>" name="<?= $name ?>" class="<?= $val["class_input"] ?>" value="<?= $val["value"] ?>" <?= $otherfields; ?> /><?php
 			}
-			if ($val["description"]) {
-				?><p class="<?= $name . "-description" ?>"><?= $val["description"] ?></p><?php
-			}
+
 
 			if ($val["input"] != "hidden") {
 				?></div><?php
@@ -249,6 +344,7 @@ class bii_project extends global_class {
 			return 'autres';
 		}
 	}
+
 	function getCategorieName() {
 		$prefix = static::prefix_bdd();
 		$identifiant = terms::identifiant();
