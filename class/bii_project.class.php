@@ -63,10 +63,10 @@ class bii_project extends global_class {
 			<h3><label for="uselevels"><?= $text; ?> </label><input type="checkbox" id="uselevels" /></h3>
 			<div class="formlevels">
 				<div class="level-controls">
-					<input id="product_level_count" name="product_level_count" type="hidden" value="1" />
+					<input id="product_level_count" name="project_levels" type="hidden" value="1" />
 					<button class="add-level">Ajouter une contrepartie</button>
 					<button class="remove-level">Retirer la dernière contrepartie</button>
-
+					<!--.level-controls-->
 				</div>
 				<div class="container-levels">
 
@@ -82,6 +82,7 @@ class bii_project extends global_class {
 
 					function otherlevel_footer() {
 						?>
+						<!--.otherform-->
 					</div>
 
 					<?php
@@ -89,6 +90,7 @@ class bii_project extends global_class {
 
 				function footer_form_front_levels($method) {
 					?>
+					<!--.container-levels-->
 				</div>
 				<div class="dropzone-levels"></div>
 				<div class="firstform">
@@ -100,8 +102,11 @@ class bii_project extends global_class {
 						$this->input_front($prop, $val);
 					}
 					?>
+					<!--.firstform-->
 				</div>
+				<!--.formlevels-->
 			</div>
+			<!--.vc_col-xs-12-->
 		</div>
 		<?php
 	}
@@ -123,7 +128,6 @@ class bii_project extends global_class {
 	}
 
 	function prop_infos() {
-
 		$options = terms::array_slug_name("term_id in (select term_id from " . terms::prefix_bdd() . "term_taxonomy where taxonomy = 'project_category') order by name asc");
 		$array = [
 			"project_name" => ["value" => $this->project_name, "label" => "Titre de la campagne", "class" => "vc_col-xs-12 col-xs-12 vc_col-sm-8", "class_input" => "required"],
@@ -146,7 +150,6 @@ class bii_project extends global_class {
 
 	function prop_detail() {
 		$array = [
-
 			"project_short_description" => ["value" => $this->project_description, "label" => "Description courte de votre projet", "input" => "textarea"],
 			"project_long_description" => ["value" => $this->long_description, "label" => "Description longue de votre projet", "input" => "textarea"],
 			"project_faq" => ["value" => $this->faqs, "label" => "FAQ du projet", "input" => "textarea", "class" => "vc_col-xs-12 col-xs-12 vc_col-sm-6"],
@@ -157,7 +160,6 @@ class bii_project extends global_class {
 
 	function prop_images() {
 		$array = [
-
 			"project_hero" => ["value" => $this->project_hero, "label" => "Image à la une", "input" => "file", "class" => "vc_col-xs-12 col-xs-12 vc_col-sm-6"],
 			"project_image2" => ["value" => $this->product_image2, "label" => "Image 2", "input" => "file", "class" => "vc_col-xs-12 col-xs-12 vc_col-sm-6"],
 			"project_image3" => ["value" => $this->product_image3, "label" => "Image 3", "input" => "file", "class" => "vc_col-xs-12 col-xs-12 vc_col-sm-6"],
@@ -178,13 +180,34 @@ class bii_project extends global_class {
 		return $array;
 	}
 
-	static function prop_newlevel($i = 1) {
+	function prop_newlevel($i = 1) {
+		if ($i == 1) {
+			$values = [
+				$this->product_title,
+				$this->product_price,
+				$this->product_limit,
+				$this->product_short_description,
+				$this->product_details,
+			];
+		} else {
+			$values = [];
+			$variables = [
+				"title", "price", "limit", "short_desc", "desc"
+			];
+			foreach ($variables as $val) {
+				$varname = "product_level_$i" . "_$val";
+//				pre($varname,"green");
+				$values[] = $this->$varname;
+			}
+//			pre($values,"red");
+		}
+
 		$array = [
-			"project_level_title[$i]" => ["value" => "", "label" => "Titre de la contrepartie", "type" => "text", "description" => "Vous pouvez choisir de récompenser les donateurs, à partir d'une certaine somme, ou de récompenser les premiers !"],
-			"project_level_price[$i]" => ["value" => 0, "label" => "Somme à verser", "class" => "vc_col-xs-12 col-xs-12 vc_col-sm-6 col-sm-6 ", "type" => "number", "description" => "Entrez le montant à partir duquel vous souhaitez appliquer cette récompense"],
-			"project_level_limit[$i]" => ["value" => 0, "label" => "Nombre maximum de contreparties", "class" => "vc_col-xs-12 col-xs-12 vc_col-sm-6 col-sm-6 ", "type" => "number", "description" => "Entrez le nombre limite de donateurs pour cette récompense"],
-			"level_description[$i]" => ["value" => "", "label" => "Description courte", "input" => "textarea", "description" => "S'affiche dans la liste"],
-			"level_long_description[$i]" => ["value" => "", "label" => "Description longue", "input" => "textarea", "description" => "S'affiche en détail sur le côté"],
+			"project_level_title[$i]" => ["value" => $values[0], "label" => "Titre de la contrepartie", "type" => "text", "description" => "Vous pouvez choisir de récompenser les donateurs, à partir d'une certaine somme, ou de récompenser les premiers !"],
+			"project_level_price[$i]" => ["value" => $values[1], "label" => "Somme à verser", "class" => "vc_col-xs-12 col-xs-12 vc_col-sm-6 col-sm-6 ", "type" => "number", "description" => "Entrez le montant à partir duquel vous souhaitez appliquer cette récompense"],
+			"project_level_limit[$i]" => ["value" => $values[2], "label" => "Nombre maximum de contreparties", "class" => "vc_col-xs-12 col-xs-12 vc_col-sm-6 col-sm-6 ", "type" => "number", "description" => "Entrez le nombre limite de donateurs pour cette récompense"],
+			"level_description[$i]" => ["value" => $values[3], "label" => "Description courte", "input" => "textarea", "description" => "S'affiche dans la liste"],
+			"level_long_description[$i]" => ["value" => $values[4], "label" => "Description longue", "input" => "textarea", "description" => "S'affiche en détail sur le côté"],
 		];
 		return $array;
 	}
@@ -200,7 +223,7 @@ class bii_project extends global_class {
 		$this->inputCGU();
 		$this->input_front("", ["input" => "submit"]);
 
-		pre($this);
+//		pre($this);
 	}
 
 	function form_edit_section($titre, $method) {
@@ -219,12 +242,13 @@ class bii_project extends global_class {
 		foreach ($infos as $prop => $val) {
 			$this->input_front($prop, $val);
 		}
+		$this->otherlevel_footer();
 		static::footer_form_front_levels($method);
 	}
 
 	function newformlevel($index = 1) {
 		$this->otherlevel_header($index);
-		$infos = static::prop_newlevel($index);
+		$infos = $this->prop_newlevel($index);
 		foreach ($infos as $prop => $val) {
 			$this->input_front($prop, $val);
 		}
@@ -331,33 +355,41 @@ class bii_project extends global_class {
 	}
 
 	function getCategorie() {
-		$prefix = static::prefix_bdd();
-		$identifiant = terms::identifiant();
-		$tt = $prefix . "term_taxonomy";
-		$tr = $prefix . "term_relationships";
-		$where = "$identifiant in(select term_id from $tt tt inner join $tr tr on tr.term_taxonomy_id = tt.term_taxonomy_id where tr.object_id = $this->id_post and tt.taxonomy='project_category')";
-		$list = terms::all_id($where);
-		if (count($list)) {
-			$item = new terms($list[0]);
-			return $item->slug();
-		} else {
-			return 'autres';
+
+		if (!$this->bii_catslug) {
+
+			$prefix = static::prefix_bdd();
+			$identifiant = terms::identifiant();
+			$tt = $prefix . "term_taxonomy";
+			$tr = $prefix . "term_relationships";
+			$where = "$identifiant in(select term_id from $tt tt inner join $tr tr on tr.term_taxonomy_id = tt.term_taxonomy_id where tr.object_id = $this->id_post and tt.taxonomy='project_category')";
+			$list = terms::all_id($where);
+			if (count($list)) {
+				$item = new terms($list[0]);
+				$this->bii_catslug = $item->slug();
+			} else {
+				$this->bii_catslug = 'autres';
+			}
 		}
+		return $this->bii_catslug;
 	}
 
 	function getCategorieName() {
-		$prefix = static::prefix_bdd();
-		$identifiant = terms::identifiant();
-		$tt = $prefix . "term_taxonomy";
-		$tr = $prefix . "term_relationships";
-		$where = "$identifiant in(select term_id from $tt tt inner join $tr tr on tr.term_taxonomy_id = tt.term_taxonomy_id where tr.object_id = $this->id_post and tt.taxonomy='project_category')";
-		$list = terms::all_id($where);
-		if (count($list)) {
-			$item = new terms($list[0]);
-			return ucfirst($item->name());
-		} else {
-			return 'Autres';
+		if (!$this->bii_catname) {
+			$prefix = static::prefix_bdd();
+			$identifiant = terms::identifiant();
+			$tt = $prefix . "term_taxonomy";
+			$tr = $prefix . "term_relationships";
+			$where = "$identifiant in(select term_id from $tt tt inner join $tr tr on tr.term_taxonomy_id = tt.term_taxonomy_id where tr.object_id = $this->id_post and tt.taxonomy='project_category')";
+			$list = terms::all_id($where);
+			if (count($list)) {
+				$item = new terms($list[0]);
+				$this->bii_catname = ucfirst($item->name());
+			} else {
+				$this->bii_catname = 'Autres';
+			}
 		}
+		return $this->bii_catname;
 	}
 
 }

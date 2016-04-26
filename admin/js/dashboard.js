@@ -71,4 +71,34 @@ jQuery(function ($) {
 	});
 	
 	$(".update-nag ").addClass("hidden");
+	
+	$(".formlevels .add-level").on("click", function (e) {
+			e.preventDefault();
+			//bii_add_new_level
+			var index = $("#product_level_count").val() * 1 + 1;
+			jQuery.ajax({
+				url: ajaxurl,
+				type: 'POST',
+				data: {action: 'bii_add_new_level', index: index, post_id: $("#project_post_id").val()},
+				success: function (newlevel) {
+					$(".container-levels").prepend(newlevel);
+					$(".container-levels .otherform:first-of-type").hide();
+					$("#product_level_count").val(index);
+					$(".remove-level").show();
+					$(".container-levels .otherform:first-of-type").show(700);
+				}
+			});
+		});
+		$(".formlevels .remove-level").on("click", function (e) {
+			e.preventDefault();
+			var index = $("#product_level_count").val() * 1 - 1;
+			$("#product_level_count").val(index);
+			$(".container-levels .otherform:first-of-type").hide(500, function () {
+				$(this).remove();
+			});
+
+			if (index == 1) {
+				$(".remove-level").hide();
+			}
+		});
 });

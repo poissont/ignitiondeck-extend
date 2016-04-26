@@ -139,7 +139,7 @@ jQuery(function ($) {
 			jQuery.ajax({
 				url: ajaxurl,
 				type: 'POST',
-				data: {action: 'bii_add_new_level', index: index},
+				data: {action: 'bii_add_new_level', index: index, post_id: $("#project_post_id").val()},
 				success: function (newlevel) {
 					$(".container-levels").prepend(newlevel);
 					$(".container-levels .otherform:first-of-type").hide();
@@ -153,10 +153,10 @@ jQuery(function ($) {
 			e.preventDefault();
 			var index = $("#product_level_count").val() * 1 - 1;
 			$("#product_level_count").val(index);
-			$(".container-levels .otherform:first-of-type").hide(500,function(){
+			$(".container-levels .otherform:first-of-type").hide(500, function () {
 				$(this).remove();
 			});
-			
+
 			if (index == 1) {
 				$(".remove-level").hide();
 			}
@@ -213,8 +213,9 @@ jQuery(function ($) {
 
 	if ($("#form_pay").length) {
 		$('#level_select').ddslick('destroy');
-		
-		$('input[name="price"]').unbind("change",false);
+		$(".fieldpe").hide();
+
+		$('input[name="price"]').unbind("change", false);
 		$('input[name="price"]').on("click keyup keydown change", function () {
 			$(this).removeClass("red-border");
 		});
@@ -229,12 +230,15 @@ jQuery(function ($) {
 				if (isNaN(pricenb)) {
 					bii_CL("nan");
 					pricenb = 1;
-					$('input[name="price"]').attr("type", "number");
+					$(".fieldpe").show();
 					$('.preorder-form-product-price').text("");
+					$('input[name="price_entry"]').val(pricenb);
+					$('input[name="price"]').val(pricenb);
 				} else {
 					bii_CL("ian");
 					$('input[name="price"]').val(price);
-					$('input[name="price"]').attr("type", "hidden");
+
+					$(".fieldpe").hide();
 					$('.preorder-form-product-price').text(price);
 				}
 				$('input[name="price"]').removeClass("red-border");
@@ -253,17 +257,19 @@ jQuery(function ($) {
 		});
 		$("#form_pay").on("submit", function (e) {
 			var ddtext = $(".dd-selected-text").text();
-			alert(ddtext);
-			if (!ddtext.indexOf("Montant Libre")) {
 
+			if (!ddtext.indexOf("Montant Libre")) {
+				var overrideprice = $(".dd-option-selected .dd-option-price").val();
+				$('input[name="price_entry"]').val(overrideprice);
 			} else {
+				$('input[name="price"]').val($('input[name="price_entry"]').val());
 				if (!$('input[name="price"]').val()) {
-					$('input[name="price"]').addClass("red-border");
+					$('input[name="price_entry"]').addClass("red-border");
 				} else {
-					$('input[name="price"]').remove("red-border");
+					$('input[name="price_entry"]').remove("red-border");
 				}
 			}
-			e.preventDefault();
+			alert($('input[name="price"]').val());
 		});
 	}
 

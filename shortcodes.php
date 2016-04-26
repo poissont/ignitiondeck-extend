@@ -475,48 +475,23 @@ function id_submissionFormFront($post_id = null) {
 					if (isset($_POST['project_fund_type'])) {
 						array_pop($_POST['project_fund_type']);
 					}
-					for ($i = 0, $j = 0; $i <= $project_levels ; $i++) {
-						$saved_levels[$i] = array();
-						if (isset($_POST['project_level_title'][$i])) {
-							$saved_levels[$i]['title'] = $_POST['project_level_title'][$i];
-						} else {
-							// project is live and title cannot be edited
-							$saved_levels[$i]['title'] = $levels[$i]['title'];
-						}
-						if (isset($_POST['project_level_price'][$i])) {
-							if (empty($_POST['project_level_price'][$i])) {
-								$saved_levels[$i]['price'] = sanitize_text_field($_POST['project_level_price'][$i]);
-							} else {
-								$saved_levels[$i]['price'] = floatval(str_replace(',', '', $_POST['project_level_price'][$i]));
-							}
-						} else {
-							// project is live and price cannot be edited
-							$saved_levels[$i]['price'] = $levels[$i]['price'];
-						}
-						$saved_levels[$i]['short'] = sanitize_text_field($_POST['level_description'][$i]);
-						$saved_levels[$i]['long'] = wpautop(wp_kses_post(balanceTags($_POST['level_long_description'][$i])));
-						if (isset($_POST['project_level_limit'][$i])) {
-							$saved_levels[$i]['limit'] = absint($_POST['project_level_limit'][$i]);
-						} else {
-							// project is live and limit cannot be edited
-							$saved_levels[$i]['limit'] = $levels[$i]['limit'];
-						}
-
-						if (!isset($status) || (isset($status) && $status != "publish")) {
-							if (isset($_POST['project_fund_type'][$i])) {
-								$saved_funding_types[$i] = sanitize_text_field($_POST['project_fund_type'][$i]);
-							} else {
-								$saved_funding_types[$i] = $levels_project_fund_type[$i];
-							}
-						} else {
-							if (isset($levels_project_fund_type[$i])) {
-								$saved_funding_types[$i] = $levels_project_fund_type[$i];
-							} else {
-								$saved_funding_types[$i] = sanitize_text_field($_POST['project_fund_type'][$j]);
-								$j++;
-							}
-						}
+					$indexsaved = [];
+					$project_levels = 0;
+					foreach($_POST["project_level_title"] as $key=>$level_title){
+						$level_price = $_POST["project_level_price"][$key];
+						$level_limit = $_POST["project_level_limit"][$key];
+						$level_description = $_POST["level_description"][$key];
+						$level_long_description = $_POST["level_long_description"][$key];
+						$saved_levels[$key]=array();
+						$saved_levels[$key]['title'] = $level_title;
+						$saved_levels[$key]['price'] = floatval($level_price);
+						$saved_levels[$key]['short'] = sanitize_text_field($level_description);
+						$saved_levels[$key]['long'] = wpautop(wp_kses_post(balanceTags(($level_long_description))));
+						$saved_levels[$key]['limit'] = absint($level_limit);
+						$indexsaved[] = $key;
+						++$project_levels;
 					}
+					
 				}
 
 				// Create user variables
@@ -605,6 +580,11 @@ function id_submissionFormFront($post_id = null) {
 							$proj_args['product_price'] = $saved_levels[0]['price'];
 						}
 						$proj_args['goal'] = $project_goal;
+						
+//						bii_write_log("proj_args");
+//						bii_write_log($proj_args);
+//						bii_write_log("is");
+//						bii_write_log($indexsaved);
 						$project_id = get_post_meta($post_id, 'ign_project_id', true);
 						if (!empty($project_id)) {
 							$project = new ID_Project($project_id);
@@ -692,13 +672,18 @@ function id_submissionFormFront($post_id = null) {
 							update_post_meta($post_id, 'ign_product_details', $saved_levels[0]['long']); /* level 1 */
 							update_post_meta($post_id, 'ign_product_limit', $saved_levels[0]['limit']); /* level 1 */
 
-							for ($i = 2; $i <= $project_levels; $i++) {
-								update_post_meta($post_id, 'ign_product_level_' . ($i) . '_title', $saved_levels[$i - 1]['title']);
-								update_post_meta($post_id, 'ign_product_level_' . ($i) . '_price', $saved_levels[$i - 1]['price']);
-								update_post_meta($post_id, 'ign_product_level_' . ($i) . '_short_desc', $saved_levels[$i - 1]['short']);
-								update_post_meta($post_id, 'ign_product_level_' . ($i) . '_desc', $saved_levels[$i - 1]['long']);
-								update_post_meta($post_id, 'ign_product_level_' . ($i) . '_limit', $saved_levels[$i - 1]['limit']);
+							
+							$arrayvals = ["title","price","short","long","limit"];
+							foreach($indexsaved as $index){
+								if($index != 0){ // $indexsaved[0] a déjà été inséré...
+									foreach($arrayvals as $tpsll){
+										$baseval = "ign_product_level_$index"."_$tpsll";
+										update_post_meta($post_id, $baseval, $saved_levels[$index][$tpsll]);
+									}
+								}								
+								
 							}
+							
 							// Saving project fund type for all the levels in postmeta
 							update_post_meta($post_id, 'mdid_levels_fund_type', $saved_funding_types);
 

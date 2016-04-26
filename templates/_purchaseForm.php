@@ -68,7 +68,6 @@ add_action('wp_enqueue_scripts', function() {
 								}
 								?>
 								<div class="<?= $options["class"]; ?> idinput">
-
 									<div class="idfield">
 										<?php
 										if ($options["type"] == "select") {
@@ -83,8 +82,8 @@ add_action('wp_enqueue_scripts', function() {
 												?><input type="<?= $options["type"]; ?>" name="<?= $fs; ?>" class="<?= (isset($purchase_form->form_settings[$fs]['mandatory'])) ? 'required' : ''; ?>" id="<?= $fs; ?>" placeholder="<?= $plholdr ?>" /><?php
 											}
 											?>
-															</div>
-														</div>
+									</div>
+								</div>
 								<?php
 								++$i;
 							}
@@ -105,9 +104,9 @@ add_action('wp_enqueue_scripts', function() {
 
 								if (isset($purchase_form->project_type) && $purchase_form->project_type !== "pwyw") {
 									?>
-											<label class="idfield_label" for="level_select">Contrepartie :</label>
-												<div class="idfield">
-													<select name="level_select" id="level_select">
+									<label class="idfield_label" for="level_select">Contrepartie :</label>
+										<div class="idfield">
+											<select name="level_select" id="level_select">
 											<?php
 											foreach ($purchase_form->level_data as $level_item) {
 												$value = $level_item->id;
@@ -130,34 +129,34 @@ add_action('wp_enqueue_scripts', function() {
 												}
 												$display = "$title " . " $dp$addon";
 												?>
-															<option value="<?= $value ?>" data-description="<?= $dd ?>" data-price="<?= $dp ?>" <?= $disabled; ?>>
+																		<option value="<?= $value ?>" data-description="<?= $dd ?>" data-price="<?= $dp ?>" <?= $disabled; ?>>
 													<?= $display ?>
-															</option>
+																		</option>
 												<?php
 											}
 											?>
-													</select>
-												</div>
+															</select>
+														</div>
 									<?php
 								} else {
 									?>
-												<label class="idfield_label" for="price_entry"><?php echo $tr_Price_Entry; ?>:</label>
-												<div class="idfield"><input type="text" name="price_entry" id="price_entry" value=""/></div>
-												<input type="hidden" name="level_select" id="level_select" value="1"/>
+														<label class="idfield_label" for="price_entry"><?php echo $tr_Price_Entry; ?>:</label>
+														<div class="idfield"><input type="text" name="price_entry" id="price_entry" value=""/></div>
+														<input type="hidden" name="level_select" id="level_select" value="1"/>
 									<?php
 								}
 							}
 							?>
 						</li>
 						<?php if ($level) { ?>
-										<div class="vc_col-xs-12 idinput">
-											<div class="id-checkout-level-desc" desc="$">
-												<strong>
+											<div class="vc_col-xs-12 idinput">
+												<div class="id-checkout-level-desc" desc="$">
+													<strong>
 										<?php echo (isset($purchase_form->project_type) && $purchase_form->project_type !== "pwyw" ? "Contrepartie : " : ''); ?>
-												</strong>
+													</strong>
 									<?= (isset($meta_desc) ? strip_tags(html_entity_decode($meta_desc)) : ''); ?>
+												</div>
 											</div>
-										</div>
 							<?php
 						}
 						$valueprice = 0;
@@ -179,7 +178,10 @@ add_action('wp_enqueue_scripts', function() {
 								<label class="idfield_label" for="price"><?php echo $tr_Total_Contribution; ?> </label>
 								<div class="idfield" class='vc_col-xs-12'>
 									<div class='vc_col-xs-6'>
-										<input type="<?= ($valueprice == 0 ) ? "number" : "hidden"; ?>" id='form_prix' name="price" value="<?= $valueprice ?>" />
+										<input type="hidden" id='form_prix' name="price" value="<?= $valueprice ?>" />
+										<div class="idfield fieldpe">
+											<input type="number" name="price_entry" id="price_entry" value=""/>
+										</div>
 										<span class="preorder-form-product-price">
 											<?= $valueprice; ?>
 										</span>

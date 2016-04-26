@@ -20,13 +20,12 @@
 						<div class="col-xxs-12 pl-zdt bii_option hidden">
 							<h2 class="faa-parent animated-hover"><i class="fa fa-cogs faa-ring"></i> Zone de test</h2>
 							<?php
-//							$projet = bii_project::fromIdPost(11);
-////							
-//							$projet->form_edit_levels("Voulez vous utiliser des contreparties ? ", "prop_levels");
-//							pre($projet,"orange");
+//							
+//							
 							?>
 						</div>
 					<?php } ?>
+					<div class="clear"></div>
 					<button class="publier btn btn-success hidden" accesskey="p" tabindex="5"><span class="fa fa-save"></span> Enregistrer les modifications</button>
 				</form>
 			</div>

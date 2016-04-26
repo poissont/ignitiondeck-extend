@@ -405,6 +405,14 @@ add_filter("bii-esg-additional_query", function($additional_query) {
 add_filter('essgrid_query_caching', 'eg_stop_caching', 10, 2);
 add_filter('essgrid_get_posts', 'eg_mod_query', 10, 2);
 
+add_action("ide_fes_submit",function($post_id, $project_id, $vars){
+//	bii_write_log($vars);	
+},10,3);
+add_action("ide_fes_update",function($user_id, $project_id, $post_id, $proj_args, $saved_levels, $saved_funding_types){
+//	bii_write_log("ide_fes_update");	
+//	bii_write_log($saved_levels);	
+},10,6);
+
 // turn off caching for your grid
 function eg_stop_caching($do_cache, $grid_id) {
 
