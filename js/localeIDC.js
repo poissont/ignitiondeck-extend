@@ -85,9 +85,9 @@ jQuery(function ($) {
 		});
 		$('#uselevels').on("click", function () {
 			if ($(this).is(':checked')) {
-				$(".formlevels").show();
+				$(".formlevels").show(700);
 			} else {
-				$(".formlevels").hide();
+				$(".formlevels").hide(500);
 			}
 		});
 

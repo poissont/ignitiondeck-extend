@@ -131,10 +131,10 @@ class bii_project extends global_class {
 		$options = terms::array_slug_name("term_id in (select term_id from " . terms::prefix_bdd() . "term_taxonomy where taxonomy = 'project_category') order by name asc");
 		$array = [
 			"project_name" => ["value" => $this->project_name, "label" => "Titre de la campagne", "class" => "vc_col-xs-12 col-xs-12 vc_col-sm-8", "class_input" => "required"],
-			"project_goal" => ["value" => $this->fund_goal, "label" => "Objectif Financier", "input" => "number", "step" => "any", "min" => 0, "class" => "vc_col-xs-12 col-xs-12 vc_col-sm-4", "class_input" => "required"],
+			"project_goal" => ["value" => $this->fund_goal, "label" => "Objectif Financier", "input" => "number", "step" => "any", "min" => 0, "class" => "vc_col-xs-12 col-xs-12 vc_col-sm-4", "class_input" => "required","onlycreate"=>true],
 			"project_category" => ["value" => $this->project_category, "label" => "Catégorie du projet", "input" => "select", "options" => $options,],
-			"project_start" => ["value" => $this->start_date, "label" => "Date de début", "class" => "vc_col-xs-12 col-xs-12 vc_col-sm-6", "input" => "datepicker", "class_input" => "required"],
-			"project_end" => ["value" => $this->fund_end, "label" => "Date de fin", "class" => "vc_col-xs-12 col-xs-12 vc_col-sm-6", "input" => "datepicker",],
+			"project_start" => ["value" => $this->start_date, "label" => "Date de début", "class" => "vc_col-xs-12 col-xs-12 vc_col-sm-6", "input" => "datepicker", "class_input" => "required","onlycreate"=>true],
+			"project_end" => ["value" => $this->fund_end, "label" => "Date de fin", "class" => "vc_col-xs-12 col-xs-12 vc_col-sm-6", "input" => "datepicker","onlycreate"=>true],
 			"project_end_type" => [
 				"value" => $this->end_type,
 				"label" => "Options de fin de campagne",
@@ -143,7 +143,7 @@ class bii_project extends global_class {
 					"closed" => "Fermer quand le montant est atteint",
 					"open" => "Laisser ouvert",
 				],
-			],
+			"onlycreate"=>true],
 		];
 		return $array;
 	}
@@ -217,7 +217,7 @@ class bii_project extends global_class {
 		$this->form_edit_section("Informations sur le projet", "prop_infos");
 		$this->form_edit_section("Détails du projet", "prop_detail");
 		$this->form_edit_section("Images du projet", "prop_images");
-		if (bii_canshow_debug()) {
+		if (bii_canshow_debug() && !$this->id_post) {
 			$this->form_edit_levels("Voulez vous utiliser des contreparties ? ", "prop_levels");
 		}
 		$this->inputCGU();
@@ -267,90 +267,99 @@ class bii_project extends global_class {
 	}
 
 	function input_front($name, $val = []) {
-		if (!isset($val["value"])) {
-			if (property_exists($this, $name)) {
-				$val["value"] = $this->$name;
-			} else {
-				$val["value"] = "";
-			}
+		if (!isset($val["onlycreate"])) {
+			$val["onlycreate"] = false;
 		}
-		if (!isset($val["class"]) || !$val["class"]) {
-			$val["class"] = "vc_col-xs-12 col-xs-12";
+		$display = true;
+		if($val["onlycreate"] && $this->id_post){
+			$display = false;
 		}
-		if (!isset($val["input"]) || !$val["input"]) {
-			$val["input"] = "text";
-		}
-		if (!isset($val["label"]) || !$val["label"]) {
-			$val["label"] = $name;
-		}
-		if (!isset($val["description"]) || !$val["description"]) {
-			$val["description"] = "";
-		}
-		if (!isset($val["class_input"])) {
-			$val["class_input"] = "";
-		}
-		$val["class_input"] .= " $name form-control";
-		if ($val["input"] != "hidden") {
-			$namelabel = $name;
-			if ($val["input"] == "datepicker") {
-				$namelabel.= "-dtp";
-			}
-			if (strpos($val["class_input"], "required") !== false) {
-				$val["label"] .= " *";
-			}
-			?>
-			<div class="<?= $val["class"]; ?>">
-				<label for="<?= $namelabel ?>" title="<?= $val["description"] ?>"><?= $val["label"]; ?> 
-					<?php
-					if ($val["description"]) {
-						?><span class="fa fa-info-circle toogle-information" ></span><?php
-					}
-					?></label><?php
-			}
-			$otherfields = "";
-			if ($val["input"] == "file") {
-				$otherfields = 'accept="image/*"';
-				if ($val["value"]) {
-					?><div style="background-image: url('<?= $val["value"]; ?>');background-repeat: no-repeat; background-size: 150px auto;" class="project-thumb image"></div><?php
-					}
+		if ($display) {
+			if (!isset($val["value"])) {
+				if (property_exists($this, $name)) {
+					$val["value"] = $this->$name;
+				} else {
+					$val["value"] = "";
 				}
-				if (isset($val["data-pattern"]) && $val["data-pattern"]) {
-					$otherfields.= " data-pattern='" . $val["data-pattern"] . "'";
-				}
-				if (isset($val["readonly"]) && $val["readonly"]) {
-					$otherfields.= " readonly='readonly'";
-				}
-
-				if ($val["input"] == "number") {
-					$otherfields = "min='" . $val["min"] . "' step='" . $val["step"] . "'";
-				}
-				if ($val["input"] == "textarea") {
-					?><textarea id="<?= $name ?>" name="<?= $name ?>" class="<?= $val["class_input"] ?>" ><?= $val["value"] ?></textarea><?php
-			} elseif ($val["input"] == "select") {
-				?><select id="<?= $name ?>" name="<?= $name ?>" class="<?= $val["class_input"] ?>" ><?php
-						foreach ($val["options"] as $value => $display_value) {
-							$selected = "";
-							if ($val["value"] == $value) {
-								$selected = "selected='selected'";
-							}
-							?><option value="<?= $value ?>" <?= $selected ?>><?= utf8_encode($display_value) ?></option>
-					<?php } ?></select><?php
-			} elseif ($val["input"] == "submit") {
-				?><input type="submit" value="Enregistrer votre projet !" class="project_fesubmit" name="project_fesubmit" id="project_fesubmit" /><?php
-				} elseif ($val["input"] == "datepicker") {
-					$valexp = explode("/", $val["value"]);
-					$newval = $val["value"];
-					if (isset($valexp[1])) {
-						$newval = $valexp[1] . "/" . $valexp[0] . "/" . $valexp[2];
-					}
-					?><input type="hidden" id="<?= $name ?>"  name="<?= $name ?>"  value="<?= $val["value"] ?>" /><input type="text" id="<?= $name ?>-dtp"  name="<?= $name ?>-dtp"  value="<?= $newval ?>" class="<?= $val["class_input"] ?> datepicker" data-relative="<?= $name ?>" /><?php
-			} else {
-				?><input id="<?= $name ?>" type="<?= $val["input"] ?>" name="<?= $name ?>" class="<?= $val["class_input"] ?>" value="<?= $val["value"] ?>" <?= $otherfields; ?> /><?php
 			}
-
-
+			if (!isset($val["class"]) || !$val["class"]) {
+				$val["class"] = "vc_col-xs-12 col-xs-12";
+			}
+			if (!isset($val["input"]) || !$val["input"]) {
+				$val["input"] = "text";
+			}
+			if (!isset($val["label"]) || !$val["label"]) {
+				$val["label"] = $name;
+			}
+			if (!isset($val["description"]) || !$val["description"]) {
+				$val["description"] = "";
+			}
+			if (!isset($val["class_input"])) {
+				$val["class_input"] = "";
+			}
+			$val["class_input"] .= " $name form-control";
 			if ($val["input"] != "hidden") {
-				?></div><?php
+				$namelabel = $name;
+				if ($val["input"] == "datepicker") {
+					$namelabel.= "-dtp";
+				}
+				if (strpos($val["class_input"], "required") !== false) {
+					$val["label"] .= " *";
+				}
+				?>
+				<div class="<?= $val["class"]; ?>">
+					<label for="<?= $namelabel ?>" title="<?= $val["description"] ?>"><?= $val["label"]; ?> 
+						<?php
+						if ($val["description"]) {
+							?><span class="fa fa-info-circle toogle-information" ></span><?php
+						}
+						?></label><?php
+				}
+				$otherfields = "";
+				if ($val["input"] == "file") {
+					$otherfields = 'accept="image/*"';
+					if ($val["value"]) {
+						?><div style="background-image: url('<?= $val["value"]; ?>');background-repeat: no-repeat; background-size: 150px auto;" class="project-thumb image"></div><?php
+						}
+					}
+					if (isset($val["data-pattern"]) && $val["data-pattern"]) {
+						$otherfields.= " data-pattern='" . $val["data-pattern"] . "'";
+					}
+					if (isset($val["readonly"]) && $val["readonly"]) {
+						$otherfields.= " readonly='readonly'";
+					}
+
+					if ($val["input"] == "number") {
+						$otherfields = "min='" . $val["min"] . "' step='" . $val["step"] . "'";
+					}
+					if ($val["input"] == "textarea") {
+						?><textarea id="<?= $name ?>" name="<?= $name ?>" class="<?= $val["class_input"] ?>" ><?= $val["value"] ?></textarea><?php
+				} elseif ($val["input"] == "select") {
+					?><select id="<?= $name ?>" name="<?= $name ?>" class="<?= $val["class_input"] ?>" ><?php
+							foreach ($val["options"] as $value => $display_value) {
+								$selected = "";
+								if ($val["value"] == $value) {
+									$selected = "selected='selected'";
+								}
+								?><option value="<?= $value ?>" <?= $selected ?>><?= utf8_encode($display_value) ?></option>
+						<?php } ?></select><?php
+				} elseif ($val["input"] == "submit") {
+					?><input type="submit" value="Enregistrer votre projet !" class="project_fesubmit" name="project_fesubmit" id="project_fesubmit" /><?php
+					} elseif ($val["input"] == "datepicker") {
+						$valexp = explode("/", $val["value"]);
+						$newval = $val["value"];
+						if (isset($valexp[1])) {
+							$newval = $valexp[1] . "/" . $valexp[0] . "/" . $valexp[2];
+						}
+						?><input type="hidden" id="<?= $name ?>"  name="<?= $name ?>"  value="<?= $val["value"] ?>" /><input type="text" id="<?= $name ?>-dtp"  name="<?= $name ?>-dtp"  value="<?= $newval ?>" class="<?= $val["class_input"] ?> datepicker" data-relative="<?= $name ?>" /><?php
+				} else {
+					?><input id="<?= $name ?>" type="<?= $val["input"] ?>" name="<?= $name ?>" class="<?= $val["class_input"] ?>" value="<?= $val["value"] ?>" <?= $otherfields; ?> /><?php
+				}
+
+
+				if ($val["input"] != "hidden") {
+					?></div><?php
+			}
 		}
 	}
 
