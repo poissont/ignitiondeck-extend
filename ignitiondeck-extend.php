@@ -2,7 +2,7 @@
 
 /*
   Plugin Name: Ignitiondeck-extend
-  Description: Ignitiondeck-extend - Initiondesk Extension for better languages and shortcodes
+  Description: Ignitiondeck-extend - Initiondesk Extension for french language and shortcodes
   Version: 0.9.0
   Author: BiilinkAgency
  */
