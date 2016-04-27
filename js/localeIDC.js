@@ -214,9 +214,15 @@ jQuery(function ($) {
 	if ($("#form_pay").length) {
 		$('#level_select').ddslick('destroy');
 		$(".fieldpe").hide();
+		var qs = getQueryParams(document.location.search);
 
+		if (qs.price == "") {
+			$('input[name="price"]').val(1);
+		}else{
+			$('input[name="price"]').val(qs.price);
+		}
 		$('input[name="price"]').unbind("change", false);
-		$('input[name="price"]').on("click keyup keydown change", function () {
+		$('input[name="price_entry"]').on("click keyup keydown change", function () {
 			$(this).removeClass("red-border");
 		});
 		$('#level_select').ddslick({
@@ -269,7 +275,7 @@ jQuery(function ($) {
 					$('input[name="price_entry"]').remove("red-border");
 				}
 			}
-			alert($('input[name="price"]').val());
+//			alert($('input[name="price"]').val());
 		});
 	}
 
