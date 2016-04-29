@@ -4,7 +4,7 @@ if (!isset($nom_classe)) {
 }
 $contrat = "";
 $filter = setFilter();
-ini_set('display_errors', '1');
+//ini_set('display_errors', '1');
 
 $where = $nom_classe::whereDefault() . $filter;
 $groupBy = $nom_classe::groupByDefault();

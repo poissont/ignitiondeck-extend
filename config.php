@@ -11,6 +11,8 @@ function bii_listeClass() {
 		"posts",
 		"postmeta",
 		"ign_pay_info",
+		"bii_order",
+		"bii_order_meta",
 	];
 	return $list;
 }
@@ -225,11 +227,9 @@ function bii_add_new_level_ajax() {
 	die();
 }
 
-
 add_action('wp_ajax_nopriv_bii_get_post', 'bii_get_post_ajax');
 add_action('wp_ajax_bii_add_new_level', 'bii_add_new_level_ajax');
 add_action('wp_ajax_nopriv_bii_add_new_level', 'bii_add_new_level_ajax');
-
 
 function bii_dashboard_button_main() {
 	$array_active = ["désactivé", "activé"];
@@ -405,14 +405,25 @@ add_filter("bii-esg-additional_query", function($additional_query) {
 add_filter('essgrid_query_caching', 'eg_stop_caching', 10, 2);
 add_filter('essgrid_get_posts', 'eg_mod_query', 10, 2);
 
-add_action("ide_fes_submit",function($post_id, $project_id, $vars){
+add_action("ide_fes_submit", function($post_id, $project_id, $vars) {
 //	bii_write_log($vars);	
-},10,3);
-add_action("ide_fes_update",function($user_id, $project_id, $post_id, $proj_args, $saved_levels, $saved_funding_types){
+}, 10, 3);
+add_action("ide_fes_update", function($user_id, $project_id, $post_id, $proj_args, $saved_levels, $saved_funding_types) {
 //	bii_write_log("ide_fes_update");	
 //	bii_write_log($saved_levels);	
-},10,6);
+}, 10, 6);
 
+//
+//add_filter('idc_price_format', function($amount, $gateway = null) {
+//	if (isset($_GET["price"]) && $_GET["price"]) {
+//		$amount = $_GET["price"]*1;
+//	}
+//	if($amount < 0){
+//		$amount = 0;
+//	}
+//	$amount = number_format($amount,2);
+//	return $amount;
+//}, 10, 2);
 // turn off caching for your grid
 function eg_stop_caching($do_cache, $grid_id) {
 
@@ -436,7 +447,7 @@ function eg_mod_query($query, $grid_id) {
 		$uid = get_current_user_id();
 		if ($uid) {
 			$query["author"] = $uid;
-		}else{
+		} else {
 			$query["author_name"] = "none";
 		}
 	}
@@ -444,3 +455,95 @@ function eg_mod_query($query, $grid_id) {
 
 	return $query;
 }
+
+remove_action('admin_menu', 'memberdeck_add_menus', 11);
+add_action('admin_menu', 'bii_memberdeck_add_menus', 11);
+
+function bii_memberdeck_add_menus() {
+	//if (current_user_can('manage_options')) {
+	$settings = add_menu_page(__('IDC', 'memberdeck'), 'IDC', 'idc_manage_products', 'idc', 'idc_settings', plugins_url('/images/ignitiondeck-menu.png', __FILE__));
+	$settings = add_submenu_page('options-general.php', 'MemberDeck', 'MemberDeck', 'manage_options', 'memberdeck-settings', 'memberdeck_settings');
+	$users = add_submenu_page('idc', __('Members', 'memberdeck'), __('Members', 'memberdeck'), 'idc_manage_members', 'idc-users', 'idc_users');
+	$orders = add_submenu_page('idc', __('Orders', 'memberdeck'), __('Orders', 'memberdeck'), 'idc_manage_orders', 'idc-orders', 'bii_idc_orders');
+	$payments = add_submenu_page('idc', __('Gateways', 'memberdeck'), __('Gateways', 'memberdeck'), 'idc_manage_gateways', 'idc-gateways', 'idc_gateways');
+	$email = add_submenu_page('idc', __('Email', 'memberdeck'), __('Email', 'memberdeck'), 'idc_manage_email', 'idc-email', 'idc_email');
+	$pathways = add_submenu_page('idc', __('Upgrades', 'memberdeck'), __('Upgrades', 'memberdeck'), 'idc_manage_products', 'idc-pathways', 'idc_pathways');
+	$view_order = add_submenu_page('', __('View Order', 'memberdeck'), "", 'idc_manage_orders', 'idc-view-order', 'view_order_details');
+	$edit_order = add_submenu_page('', __('Edit Order', 'memberdeck'), "", 'idc_manage_orders', 'idc-edit-order', 'edit_order_details');
+
+	add_action('admin_print_styles-' . $email, 'idc_email_scripts');
+	global $crowdfunding;
+	if ($crowdfunding) {
+		$bridge_settings = add_submenu_page('idc', __('Crowdfunding', 'mdid'), __('Crowdfunding', 'mdid'), 'idc_manage_crowdfunding', 'idc-bridge-settings', 'idc_bridge_settings');
+		add_action('admin_print_styles-' . $bridge_settings, 'mdid_admin_scripts');
+		if (is_id_pro()) {
+			$enterprise_settings = add_submenu_page('idc', __('Enterprise Settings', 'mdid'), __('Enterprise Settings', 'mdid'), 'idc_manage_gateways', 'idc-enterprise-settings', 'idc_enterprise_settings');
+			add_action('admin_print_styles-' . $enterprise_settings, 'md_sc_scripts');
+		}
+	}
+	$gateways = get_option('memberdeck_gateways');
+	if (isset($gateways)) {
+		if (!is_array($gateways)) {
+			$gateways = unserialize($gateways);
+		}
+		if (isset($gateways['esc']) && $gateways['esc'] == 1) {
+			$sc_menu = add_submenu_page('idc', __('Stripe Connect', 'mdid'), __('Stripe Connect', 'mdid'), 'idc_manage_gateways', 'idc-sc-settings', 'idc_sc_settings');
+			add_action('admin_print_styles-' . $sc_menu, 'md_sc_scripts');
+		}
+	}
+	global $s3;
+	if ($s3) {
+		$s3_menu = add_submenu_page('idc', __('S3 Settings', 'mdid'), __('S3 Settings', 'mdid'), 'idc_manage_extensions', 'idc-s3-settings', 'idc_s3_settings');
+	}
+	do_action('idc_admin_menu_after');
+	//}
+}
+
+function bii_idc_orders() {
+	bii_order::plugin_list();
+}
+
+add_action('memberdeck_free_success', 'bii_save_order_meta', 100, 2);
+add_action('memberdeck_payment_success', 'bii_save_order_meta', 100, 5);
+add_action('memberdeck_preauth_success', 'bii_save_order_meta', 100, 5);
+
+function bii_save_order_meta($user_id, $order_id, $paykey = '', $fields = null, $source = '') {
+	bii_write_log("bii save order meta");
+	bii_write_log($fields);
+	$product_id = $fields["product_id"];
+	$om = new bii_order_meta();
+	$om->insert();
+	$om->updateChamps(["order_id" => $order_id, "meta_key" => "product_id", "meta_value" => $product_id]);
+}
+
+add_filter("idc_product_price", function($level_price, $product_id, $return) {
+	if (!$level_price) {
+		$level_price = $_GET["price"];
+	}
+	$level_price *=1;
+	if (!$level_price || $level_price < 0) {
+		$level_price = 1;
+	}
+	return $level_price;
+}, 10, 3);
+
+add_filter("bii_looklikevanillalevel",function($array){
+	$array["product_type"] = "purchase";
+	$array["level_name"] = $array["title"];
+	$array["level_price"] = $array["price"];
+	$array["credit_value"] = 0;
+	$array["txn_type"] = "capture";
+	$array["level_type"] = "lifetime";
+	$array["recurring_type"] = "none";
+	$array["limit_term"] = 0;
+	$array["term_length"] = 0;
+	$array["plan"] = "";
+	$array["license_count"] = 0;
+	$array["enable_renewals"] = 0;
+	$array["renewal_price"] = 0;
+	$array["enable_multiples"] = 1;
+	$array["combined_product"] = 0;
+	$array["custom_message"] = 0;
+	
+	return (object)$array;
+},10,1);

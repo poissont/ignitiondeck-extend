@@ -16,12 +16,12 @@
 				</ul>
 				<form method="post" id="poststuff" action="<?= get_admin_url(); ?>admin.php?page=<?= global_class::wp_nom_menu(); ?>">
 					<?php do_action("bii_options"); ?> 
-					<?php if ($_SERVER["REMOTE_ADDR"] == "77.154.194.84") { ?>
+					<?php if (bii_canshow_debug()) { ?>
 						<div class="col-xxs-12 pl-zdt bii_option hidden">
 							<h2 class="faa-parent animated-hover"><i class="fa fa-cogs faa-ring"></i> Zone de test</h2>
 							<?php
 //							
-//							
+							pre(bii_project::fromProdId(11)) ;
 							?>
 						</div>
 					<?php } ?>

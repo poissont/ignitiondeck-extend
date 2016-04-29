@@ -13,6 +13,33 @@ jQuery(function ($) {
 		checkEEMHeight();
 	});
 
+	if ($(".ign-project-end").length) {
+			$(".ign-project-end").each(function () {
+				var text = $(this).text();
+				var mots = text.split(" ");
+				var textrepl = "";
+				var motreplace = "texttoreplace";
+				$.each(mots, function (indexInArray, mot) {
+					if (mot.indexOf("/") != -1) {
+//					console.log(mot);
+						motreplace = mot;
+						textrepl = mot;
+						
+						var exp = mot.split("/");
+						var mois = exp[0];
+						var jour = exp[1];
+						var annee = exp[2];
+						textrepl = jour + " " + mois + " " + annee;
+						if($(this).siblings("a[href='.idc_lightbox']").length){
+							bii_CL("siblings");
+						}
+					}
+				});
+				$(this).text(text.replace(motreplace, textrepl));
+			});
+//		$date.html("");
+		}
+
 	if ($("#project_fesubmit").length) {
 		//Page de soumission des projets		
 		$("#project_fesubmit, .remove-level, .formlevels ").hide();
@@ -27,27 +54,7 @@ jQuery(function ($) {
 				$(this).append($day).append($month).append($year);
 			});
 		}
-		if ($(".ign-project-end").length) {
-			$(".ign-project-end").each(function () {
-				var text = $(this).text();
-				var mots = text.split(" ");
-				var textrepl = "";
-				var motreplace = "texttoreplace";
-				$.each(mots, function (indexInArray, mot) {
-					if (mot.indexOf("/") != -1) {
-//					console.log(mot);
-						motreplace = mot;
-						var exp = mot.split("/");
-						var mois = exp[0];
-						var jour = exp[1];
-						var annee = exp[2];
-						textrepl = jour + " " + mois + " " + annee;
-					}
-				});
-				$(this).text(text.replace(motreplace, textrepl));
-			});
-//		$date.html("");
-		}
+		
 
 		if ($(".datepicker").length) {
 			$(".datepicker").on("click change input load blur", function () {

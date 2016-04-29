@@ -17,7 +17,7 @@ function biicheckseo_enqueueJS() {
 	}
 }
 
-biicheckseo_enqueueJS();
+add_action('wp_enqueue_scripts', "biicheckseo_enqueueJS");
 
 add_action("bii_informations", function() {
 	?>

@@ -532,4 +532,80 @@ if (!function_exists("debugEcho")) {
 		return $nblet;
 	}
 
+function setFilter(&$limit = "") {
+	$filter = "";
+	if (isset($_REQUEST["filter"])) {
+		$filterbrut = $_REQUEST["filter"];
+
+		$expl1 = explode('$AND$', $filterbrut);
+		foreach ($expl1 as $item) {
+			$expl = explode("$", $item);
+			$champ_filter = $expl[0];
+			$operator = $expl[1];
+			$value_filter = '"' . $expl[2] . '"';
+
+			if ($operator == "EQ") {
+				$operator = "=";
+			}
+			if ($operator == "NOT") {
+				$operator = "NOT IN (";
+				$value_filter .= ")";
+			}
+			if ($operator == "IN") {
+				$operator = "IN (;
+			$value_filter .= )";
+			}
+			if ($operator == "LT") {
+				$operator = "<";
+			}
+			if ($operator == "GT") {
+				$operator = ">";
+			}
+			if ($operator == "LIKE") {
+				$operator = "LIKE ";
+				$value_filter = '"%' . $expl[2] . '%"';
+				$value_filter .= "";
+			}
+			if ($operator == "BEGINWITH") {
+				$operator = "LIKE ";
+				$value_filter = '"' . $expl[2] . '%"';
+				$value_filter .= "";
+			}
+			if ($operator == "ENDWITH") {
+				$operator = "LIKE ";
+				$value_filter = '"%' . $expl[2] . '"';
+				$value_filter .= "";
+			}
+
+			$filter .= " and $champ_filter $operator $value_filter";
+		}
+	}
+	if (isset($_REQUEST["limit"])) {
+		$limit.= " limit " . $_REQUEST["limit"];
+	}
+	return $filter;
+}
+
+function autoRemplissageFilter() {
+	$filter = array();
+	if (isset($_REQUEST["filter"])) {
+		$filterbrut = $_REQUEST["filter"];
+
+		$expl1 = explode('$AND$', $filterbrut);
+		foreach ($expl1 as $item) {
+			$expl = explode("$", $item);
+			$champ_filter = $expl[0];
+			$operator = $expl[1];
+			$value_filter = $expl[2];
+			$filter[] = array(
+				"champ_filter" => $champ_filter,
+				"operator" => $operator,
+				"value_filter" => $value_filter,
+			);
+		}
+	}
+
+	return $filter;
+}
+
 }

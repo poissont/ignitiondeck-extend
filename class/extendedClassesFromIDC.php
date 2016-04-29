@@ -255,3 +255,99 @@ class bii_ID_Form extends ID_Form {
 	}
 
 }
+
+class bii_ID_Member_Level extends ID_Member_Level {
+
+	public static function is_level_renewable($id) {
+		return 1;
+	}
+
+	function add_level($level) {
+		global $wpdb;
+		$this->product_type = $level['product_type'];
+		$this->level_name = $level['level_name'];
+		$this->level_price = $level['level_price'];
+		$this->credit_value = $level['credit_value'];
+		$this->txn_type = $level['txn_type'];
+		$this->level_type = $level['level_type'];
+
+		if ($this->level_type !== 'recurring') {
+			$this->recurring_type = 'none';
+			$this->plan = '';
+		} else {
+			$this->recurring_type = $level['recurring_type'];
+			$this->plan = $level['plan'];
+		}
+		$this->limit_term = $level['limit_term'];
+		$this->term_length = $level['term_length'];
+		$this->license_count = $level['license_count'];
+		$this->enable_renewals = $level['enable_renewals'];
+		$this->renewal_price = $level['renewal_price'];
+		$this->enable_multiples = 1;
+		$this->create_page = (isset($level['create_page']) ? $level['create_page'] : false);
+		$this->combined_product = (isset($level['combined_product']) ? $level['combined_product'] : 0);
+		$this->custom_message = (isset($level['custom_message']) ? $level['custom_message'] : null);
+		$sql = $wpdb->prepare('INSERT INTO ' . $wpdb->prefix . 'memberdeck_levels (product_type, level_name, level_price, credit_value, txn_type, level_type, recurring_type, limit_term, term_length, plan, license_count, enable_renewals, renewal_price, enable_multiples, combined_product, custom_message) VALUES (%s, %s, %s, %d, %s, %s, %s, %d, %d, %s, %d, %d, %s, %d, %d, %d)', $this->product_type, $this->level_name, $this->level_price, $this->credit_value, $this->txn_type, $this->level_type, $this->recurring_type, $this->limit_term, $this->term_length, $this->plan, $this->license_count, $this->enable_renewals, $this->renewal_price, $this->enable_multiples, $this->combined_product, $this->custom_message);
+		$res = $wpdb->query($sql);
+		$this->level_id = $wpdb->insert_id;
+		if ($this->create_page) {
+			$post_id = memberdeck_auto_page($this->level_id, $this->level_name);
+		}
+		return array('level_id' => $this->level_id, 'post_id' => (isset($post_id) ? $post_id : null));
+	}
+
+	public static function update_level($level) {
+		global $wpdb;
+		$product_type = $level['product_type'];
+		$level_name = $level['level_name'];
+		$level_price = $level['level_price'];
+		$credit_value = $level['credit_value'];
+		$txn_type = $level['txn_type'];
+		$level_id = $level['level_id'];
+		$level_type = $level['level_type'];
+		$recurring_type = $level['recurring_type'];
+		$limit_term = $level['limit_term'];
+		$term_length = $level['term_length'];
+		$plan = $level['plan'];
+		$license_count = $level['license_count'];
+		$enable_renewals = $level['enable_renewals'];
+		$renewal_price = $level['renewal_price'];
+		$enable_multiples = 1;
+		$combined_product = (isset($level['combined_product']) ? $level['combined_product'] : 0);
+		$custom_message = $level['custom_message'];
+		$sql = $wpdb->prepare('UPDATE ' . $wpdb->prefix . 'memberdeck_levels SET product_type = %s, level_name=%s, level_price=%s, credit_value = %d, txn_type=%s, level_type=%s, recurring_type=%s, limit_term = %d, term_length = %d, plan=%s, license_count=%d, enable_renewals = %d, renewal_price = %s, enable_multiples = %d, combined_product = %d, custom_message = %d WHERE id=%d', $product_type, $level_name, $level_price, $credit_value, $txn_type, $level_type, $recurring_type, $limit_term, $term_length, $plan, $license_count, $enable_renewals, $renewal_price, $enable_multiples, $combined_product, $custom_message, $level_id);
+		$res = $wpdb->query($sql);
+	}
+
+	public static function get_AllLevels($id) {
+		$projet = bii_project::fromProdId($id);
+//		pre($projet, "orange");
+		$levels = [];
+		$vars = get_object_vars($projet);
+		foreach($vars as $var=>$val){
+			if($var == "product_title"){
+				$i = 1;
+				$levels[$i] = [
+					"title"=>$val,
+					"limit"=>$vars["product_limit"],
+					"price"=>$vars["product_price"],
+					"short_desc"=>$vars["product_short_description"],
+					
+					];
+			}
+			if(strpos($var, "product_level_")!== false && strpos($var, "_title") !== false){
+				$i = str_replace(["product_level_","_title"],["",""],$var);
+				$levels[$i] = [
+					"title"=>$val,
+					"limit"=>$vars["product_level_$i"."_limit"],
+					"price"=>$vars["product_level_$i"."_price"],
+					"short_desc"=>$vars["product_level_$i"."_short_desc"],
+					
+					];
+			}
+		}
+//		pre($levels,"blue");
+		return $levels;
+	}
+
+}

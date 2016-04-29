@@ -18,7 +18,11 @@ function biidebug_enqueueJS() {
 	wp_enqueue_script('manual-lazyload', plugins_url('js/manual-lazyload.js', __FILE__), array('jquery', 'lazyload2', 'util'), false, true);
 }
 
-biidebug_enqueueJS();
+//biidebug_enqueueJS();
+add_action('admin_enqueue_scripts', "biidebug_enqueueJS");
+add_action('wp_enqueue_scripts', "biidebug_enqueueJS");
+
+
 if (!(get_option("bii_medium_width"))) {
 	update_option("bii_medium_width", 1050);
 }

@@ -142,7 +142,7 @@ function bii_build_preloader($post_ID) {
 	}
 }
 
-biipreloader_enqueueJS();
+add_action('wp_enqueue_scripts', "biipreloader_enqueueJS");
 
 add_action("bii_informations", function() {
 	?>

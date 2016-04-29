@@ -27,19 +27,34 @@ class bii_project extends global_class {
 	protected $project_levels;
 
 	static function fromIdPost($id) {
+//		pre(debug_backtrace(), "blue");
 		$item = new static();
-		$post = get_post($id);
-		$post_meta = get_post_meta($id);
-		$item->id_post = $id;
+		if ((int) $id) {
+			$post = get_post($id);
+			$post_meta = get_post_meta($id);
+//		pre($post_meta, "green");
+			$item->id_post = $id;
 
-		foreach ($post_meta as $key => $val) {
-			if (strpos($key, "ign_") !== false) {
-				$key = str_replace("ign_", "", $key);
-				$item->$key = $val[0];
+			foreach ($post_meta as $key => $val) {
+				if (strpos($key, "ign_") !== false) {
+					$key = str_replace("ign_", "", $key);
+					$item->$key = $val[0];
+				}
+				$item->project_hero = wp_get_attachment_image_src(get_post_thumbnail_id($id))[0];
+				$item->project_name = $post->post_title;
+				$item->project_category = $item->getCategorie();
 			}
-			$item->project_hero = wp_get_attachment_image_src(get_post_thumbnail_id($id))[0];
-			$item->project_name = $post->post_title;
-			$item->project_category = $item->getCategorie();
+		}
+		return $item;
+	}
+
+	static function fromProdId($id) {
+		$item = new static();
+		if ((int) $id) {
+//			pre("ok");
+			$liste = postmeta::all_id("meta_key='ign_project_id' AND meta_value=$id");
+			$pm = new postmeta($liste[0]);
+			$item = static::fromIdPost($pm->post_id());
 		}
 		return $item;
 	}
@@ -131,10 +146,10 @@ class bii_project extends global_class {
 		$options = terms::array_slug_name("term_id in (select term_id from " . terms::prefix_bdd() . "term_taxonomy where taxonomy = 'project_category') order by name asc");
 		$array = [
 			"project_name" => ["value" => $this->project_name, "label" => "Titre de la campagne", "class" => "vc_col-xs-12 col-xs-12 vc_col-sm-8", "class_input" => "required"],
-			"project_goal" => ["value" => $this->fund_goal, "label" => "Objectif Financier", "input" => "number", "step" => "any", "min" => 0, "class" => "vc_col-xs-12 col-xs-12 vc_col-sm-4", "class_input" => "required","onlycreate"=>true],
+			"project_goal" => ["value" => $this->fund_goal, "label" => "Objectif Financier", "input" => "number", "step" => "any", "min" => 0, "class" => "vc_col-xs-12 col-xs-12 vc_col-sm-4", "class_input" => "required", "onlycreate" => true],
 			"project_category" => ["value" => $this->project_category, "label" => "Catégorie du projet", "input" => "select", "options" => $options,],
-			"project_start" => ["value" => $this->start_date, "label" => "Date de début", "class" => "vc_col-xs-12 col-xs-12 vc_col-sm-6", "input" => "datepicker", "class_input" => "required","onlycreate"=>true],
-			"project_end" => ["value" => $this->fund_end, "label" => "Date de fin", "class" => "vc_col-xs-12 col-xs-12 vc_col-sm-6", "input" => "datepicker","onlycreate"=>true],
+			"project_start" => ["value" => $this->start_date, "label" => "Date de début", "class" => "vc_col-xs-12 col-xs-12 vc_col-sm-6", "input" => "datepicker", "class_input" => "required", "onlycreate" => true],
+			"project_end" => ["value" => $this->fund_end, "label" => "Date de fin", "class" => "vc_col-xs-12 col-xs-12 vc_col-sm-6", "input" => "datepicker", "onlycreate" => true],
 			"project_end_type" => [
 				"value" => $this->end_type,
 				"label" => "Options de fin de campagne",
@@ -143,7 +158,7 @@ class bii_project extends global_class {
 					"closed" => "Fermer quand le montant est atteint",
 					"open" => "Laisser ouvert",
 				],
-			"onlycreate"=>true],
+				"onlycreate" => true],
 		];
 		return $array;
 	}
@@ -271,7 +286,7 @@ class bii_project extends global_class {
 			$val["onlycreate"] = false;
 		}
 		$display = true;
-		if($val["onlycreate"] && $this->id_post){
+		if ($val["onlycreate"] && $this->id_post) {
 			$display = false;
 		}
 		if ($display) {
