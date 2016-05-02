@@ -51,17 +51,23 @@ class bii_order extends global_class {
 	}
 
 	public function id_produit() {
-		if (!isset($this->id_produit) || !$this->id_produit) {
+		if (!isset($this->id_produit)) {
+			bii_write_log("[bii_orderclass id_produit]");
 			$liste = bii_order_meta::all_id("order_id = $this->id AND meta_key = 'product_id'");
 			$metaobj = new bii_order_meta($liste[0]);
-			$this->id_produit = $metaobj->meta_value();
+			if ($metaobj) {
+				$this->id_produit = $metaobj->meta_value();
+			}
 		}
 		return $this->id_produit;
 	}
 
 	public function getProduit() {
-		if (!isset($this->produit) || !$this->produit) {
-			$this->produit = bii_project::fromProdId($this->id_produit());
+		if (!isset($this->produit)) {
+			bii_write_log("[bii_orderclass getProduit]");
+			if ($this->id_produit()) {
+				$this->produit = bii_project::fromProdId($this->id_produit());
+			}
 		}
 		return $this->produit;
 	}
@@ -82,8 +88,8 @@ class bii_order extends global_class {
 		</td>
 
 		<?php
-
 	}
+
 	public function user_id_ligneIA() {
 		$user_info = get_userdata($this->user_id);
 		?>
@@ -92,11 +98,11 @@ class bii_order extends global_class {
 		</td>
 
 		<?php
-
 	}
+
 	public function e_date_ligneIA() {
 		$d = $this->e_date;
-		if($d == "0000-00-00 00:00:00"){
+		if ($d == "0000-00-00 00:00:00") {
 			$d = "Instantané";
 		}
 		?>
@@ -105,7 +111,6 @@ class bii_order extends global_class {
 		</td>
 
 		<?php
-
 	}
 
 }

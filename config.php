@@ -528,6 +528,14 @@ add_filter("idc_product_price", function($level_price, $product_id, $return) {
 }, 10, 3);
 
 add_filter("bii_looklikevanillalevel",function($array){
+	pre($array);
+	if(!isset($array["title"])){
+		$array["title"] = "";
+	}
+	if(!isset($array["price"])){
+		$array["price"] = 1;
+	}
+	
 	$array["product_type"] = "purchase";
 	$array["level_name"] = $array["title"];
 	$array["level_price"] = $array["price"];
@@ -547,3 +555,122 @@ add_filter("bii_looklikevanillalevel",function($array){
 	
 	return (object)$array;
 },10,1);
+
+function bii_idc_display_checkout_descriptions($content, $level, $level_price, $user_data, $settings, $general, $credit_value) {
+	global $global_currency;
+	// Getting the required variables for the Description template
+	$customer_id = customer_id();
+
+	$type = $level->level_type;
+	$recurring = $level->recurring_type;
+	$limit_term = $level->limit_term;
+	$term_length = $level->term_length;
+	$combined_product = $level->combined_product;
+	// $credit_value = $level->credit_value;
+//	pre($content,"green");
+//	pre($level,"orange");
+//	pre($level_price,"blue");
+//	pre($user_data,"red");
+//	pre($settings,"purple");
+//	pre($general,"brown");
+//	pre($credit_value,"#3A495E");
+
+	// If there is a combined product, check which active gateways allows recurring transactions
+	if ($combined_product) {
+		$combined_level = ID_Member_Level::get_level($combined_product);
+		
+		// Now see if any CreditCard gateway is active which supports recurring products, we just need to see if we have
+		// to show that text or not in General text of different payment methods
+		$combined_purchase_gateways = idc_combined_purchase_allowed($settings);
+	} else {
+		$combined_purchase_gateways = array();
+	}
+
+	$coname = $general['coname'];
+	// Paypal currency
+	$pp_currency = 'USD';
+	if (!empty($settings)) {
+		if (is_array($settings)) {
+			$pp_currency = (isset($settings['pp_currency']) ? $settings['pp_currency'] : 'USD');
+		}
+	}
+	$cc_currency_symbol = apply_filters('idc_cc_desc_currency_sym', '$', $settings);
+	$cc_currency = apply_filters('idc_cc_desc_currency', 'USD', $settings);
+	// Stripe currency
+	$es = (isset($settings['es']) ? $settings['es'] : 0);
+	$stripe_currency = 'USD';
+	$stripe_symbol = '$';
+	
+	if (!empty($settings)) {
+		if (is_array($settings)) {
+			$stripe_currency = (isset($settings['stripe_currency']) ? $settings['stripe_currency'] : 'USD');
+			$stripe_symbol = md_currency_symbol($stripe_currency);
+		}
+	}
+
+	// Coinbase currency
+	$ecb = (isset($settings['ecb']) ? $settings['ecb'] : '0');
+	if ($ecb) {
+		$cb_currency = (isset($settings['cb_currency']) ? $settings['cb_currency'] : 'BTC');
+		$cb_symbol = md_currency_symbol($cb_currency);
+	} else {
+		$cb_currency = '';
+		$cb_symbol = '';
+	}
+
+	// Global currency symbol
+	if ($global_currency == "credits") {
+		$global_currency_sym = '$';		//ucwords(apply_filters('idc_credits_label', __('credits', 'memberdeck'), true));
+	} else {
+		$global_currency_sym = md_currency_symbol($global_currency);
+	}
+	bii_write_log("idc_checkout_descriptions");
+	
+	ob_start();
+	include_once IDC_PATH.'templates/_checkoutFreeDescription.php';
+	$free_description = ob_get_contents();
+	ob_clean();
+	$content .= apply_filters('idc_free_checkout_description', $free_description, $level, $level_price, (isset($user_data) ? $user_data : ''), $settings, $general);
+	bii_write_log("idc_free_checkout_description");
+	
+	ob_start();
+	include_once IDC_PATH.'templates/_checkoutPayPalDescription.php';
+	$paypal_description = ob_get_contents();
+	ob_clean();
+	$content .= apply_filters('idc_paypal_checkout_description', $paypal_description, $level, $level_price, (isset($user_data) ? $user_data : ''), $settings, $general);
+	bii_write_log("idc_paypal_checkout_description");
+	
+	ob_start();
+	include_once IDC_PATH.'templates/_checkoutCreditCardDescription.php';
+	$credit_card_description = ob_get_contents();
+	ob_clean();
+	$content .= apply_filters('idc_credit_card_checkout_description', $credit_card_description, $level, $level_price, (isset($user_data) ? $user_data : ''), $settings, $general);
+	bii_write_log("idc_credit_card_checkout_description");
+	
+	ob_start();
+	include_once IDC_PATH.'templates/_checkoutCreditsDescription.php';
+	$credits_description = ob_get_contents();
+	ob_clean();
+	$content .= apply_filters('idc_credits_checkout_description', $credits_description, $level, $level_price, (isset($user_data) ? $user_data : ''), $settings, $general);
+	bii_write_log("idc_credits_checkout_description");
+	
+	ob_start();
+	include_once IDC_PATH.'templates/_checkoutCoinbaseDescription.php';
+	$coinbase_description = ob_get_contents();
+	ob_clean();
+	$content .= apply_filters('idc_coinbase_checkout_description', $coinbase_description, $level, $level_price, (isset($user_data) ? $user_data : ''), $settings, $general);
+	bii_write_log("idc_coinbase_checkout_description");
+	
+	ob_start();
+	include_once IDC_PATH.'templates/_checkoutOfflineDescription.php';
+	$offline_description = ob_get_contents();
+	ob_clean();
+	$content .= apply_filters('idc_offline_checkout_description', $offline_description, $level, $level_price, (isset($user_data) ? $user_data : ''), $settings, $general);
+	bii_write_log("idc_offline_checkout_description");
+	
+	
+	ob_end_clean();
+	return $content;
+}
+remove_filter('idc_checkout_descriptions', 'idc_display_checkout_descriptions', 10, 7);
+add_filter('idc_checkout_descriptions', 'bii_idc_display_checkout_descriptions', 10, 7);

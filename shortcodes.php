@@ -775,7 +775,12 @@ function bii_memberdeck_checkout($attrs) {
 	global $global_currency;
 	global $stripe_api_version;
 	// use the shortcode attr to get our level id
+//	pre($attrs);
 	$product_id = $attrs['product'];
+//	if(isset($_GET["mdid_checkout"])){
+//		$product_id = $_GET["mdid_checkout"];
+//	}
+	
 	if (isset($pwyw) && $pwyw) {
 		if (isset($_GET['price']) && $_GET['price'] > 0) {
 			if ($global_currency == 'BTC' || $global_currency == 'credits') {

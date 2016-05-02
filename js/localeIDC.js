@@ -284,6 +284,10 @@ jQuery(function ($) {
 			}
 //			alert($('input[name="price"]').val());
 		});
+		
+		if(!$("#ppload").length){
+			
+		}
 	}
 
 	//Overrides checkIgnitionDeckForm() by bii_checkIgnitionDeckForm

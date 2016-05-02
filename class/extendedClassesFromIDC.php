@@ -320,6 +320,7 @@ class bii_ID_Member_Level extends ID_Member_Level {
 	}
 
 	public static function get_AllLevels($id) {
+		bii_write_log("[bii_ID_Member_Level get_AllLevels]");
 		$projet = bii_project::fromProdId($id);
 //		pre($projet, "orange");
 		$levels = [];

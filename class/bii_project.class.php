@@ -28,7 +28,8 @@ class bii_project extends global_class {
 
 	static function fromIdPost($id) {
 //		pre(debug_backtrace(), "blue");
-		$item = new static();
+		bii_write_log("fromIDPost $id");
+		$item = new static();		
 		if ((int) $id) {
 			$post = get_post($id);
 			$post_meta = get_post_meta($id);
